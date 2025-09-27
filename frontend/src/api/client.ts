@@ -58,3 +58,18 @@ export function downloadFile(url: string, filename: string) {
   link.click();
   document.body.removeChild(link);
 }
+
+export async function exportInsightsReport(sourceName: string, chatHistory: Array<{ role: string; content: string; plot_path?: string; step_log?: string[] }>) {
+  const res = await prismApi.post("/export_insights_report", {
+    source_name: sourceName,
+    chat_history: chatHistory
+  });
+  return res.data;
+}
+
+export function downloadMarkdownReport(markdownContent: string, filename: string) {
+  const blob = new Blob([markdownContent], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  downloadFile(url, filename);
+  URL.revokeObjectURL(url);
+}
