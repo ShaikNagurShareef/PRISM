@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Box, Flex, Text, Image, HStack, Badge, IconButton, useColorModeValue } from "@chakra-ui/react";
+import { Box, Flex, Text, Image, HStack, Badge, IconButton, useColorModeValue, Tooltip } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { NavLink, Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { FiBarChart2, FiCpu, FiLayers, FiMoon, FiSun, FiZap, FiTrendingUp, FiDatabase } from "react-icons/fi";
+import { FiBarChart2, FiCpu, FiLayers, FiMoon, FiSun, FiZap, FiTrendingUp, FiDatabase, FiMenu, FiX } from "react-icons/fi";
 import InsightsPage from "./pages/InsightsPage";
 import ModelingPage from "./pages/ModelingPage";
 import AutoRagPage from "./pages/AutoRagPage";
@@ -14,6 +14,7 @@ const MotionBox = motion(Box);
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
+  const [sidebarVisible, setSidebarVisible] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const headerBg = useColorModeValue("whiteAlpha.900", "glass.300");
@@ -36,8 +37,25 @@ export default function App() {
         <SplashScreen onEnter={handleEnterApp} />
       ) : (
         <Flex h="100vh" overflow="hidden" bg="gray.900">
-          {location.pathname !== "/about" && <Sidebar />}
-          <Flex direction="column" flex="1" overflow="hidden" ml={location.pathname !== "/about" ? "320px" : "0"}>
+          <AnimatePresence>
+            {location.pathname !== "/about" && sidebarVisible && (
+              <motion.div
+                initial={{ x: -320 }}
+                animate={{ x: 0 }}
+                exit={{ x: -320 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+              >
+                <Sidebar />
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <Flex 
+            direction="column" 
+            flex="1" 
+            overflow="hidden" 
+            ml={location.pathname !== "/about" && sidebarVisible ? "320px" : "0"}
+            transition="margin-left 0.3s ease-in-out"
+          >
         {/* Modern Header with Enhanced Styling - Hidden on About page */}
         {location.pathname !== "/about" && (
           <Flex 
@@ -166,6 +184,27 @@ export default function App() {
               </MotionBox>
             </HStack>
           </HStack>
+          
+          {/* Sidebar Toggle Button */}
+          <Tooltip 
+            label={sidebarVisible ? "Hide sidebar" : "Show sidebar"} 
+            placement="bottom"
+            hasArrow
+          >
+            <IconButton
+              aria-label={sidebarVisible ? "Hide sidebar" : "Show sidebar"}
+              icon={sidebarVisible ? <FiX /> : <FiMenu />}
+              size="md"
+              variant="ghost"
+              color="white"
+              _hover={{
+                bg: "whiteAlpha.100",
+                transform: "translateY(-1px)",
+              }}
+              onClick={() => setSidebarVisible(!sidebarVisible)}
+              transition="all 0.3s ease"
+            />
+          </Tooltip>
         </Flex>
         )}
         
