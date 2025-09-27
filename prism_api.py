@@ -14,11 +14,8 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from typing import List, Dict, Union, TypedDict, Any, Optional
 
-import sqlite3
-
-
 # --- Third-party Imports ---
-from fastapi import FastAPI, HTTPException, Body, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, Body
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
@@ -528,22 +525,6 @@ predictive_modeling_graph = build_predictive_modeling_graph()
 @app.on_event("startup")
 async def startup_event(): setup_directories()
 
-@app.post("/upload_file", tags=["Data Processing"])
-async def upload_file_endpoint(session_id: str = Form(...), file: UploadFile = File(...)):
-    """Accept a file from the browser and save it under data/incoming/{session_id}_{filename}."""
-    try:
-        incoming_dir = settings.DATA_DIR / "incoming"
-        incoming_dir.mkdir(parents=True, exist_ok=True)
-        safe_name = file.filename or "uploaded_file"
-        save_path = incoming_dir / f"{session_id}_{safe_name}"
-        with open(save_path, "wb") as f:
-            f.write(await file.read())
-        return {"path": str(save_path)}
-    except Exception as e:
-        logger.error(f"Upload failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Failed to upload file")
-
-
 @app.post("/process_source", tags=["Data Processing"])
 async def process_source(request: ProcessSourceRequest = Body(...)):
     try:
@@ -652,42 +633,6 @@ async def export_insights_report(request: ExportReportRequest):
     except Exception as e:
         logger.error(f"Error generating report: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
-    
-# ==============================================================================
-# 7. SESSION RESUME API (read-only)
-# ==============================================================================
-@app.get("/session/{session_id}", tags=["Session"])
-async def get_session(session_id: str):
-    """
-    Load a previously saved PRISM session from data/prism_sessions.db as written by prism.py.
-    Returns { session_id, sources, active_source_name, modeling } or 404 if not found.
-    """
-    try:
-        db_path = Path("./data/prism_sessions.db")
-        if not db_path.exists():
-            raise HTTPException(status_code=404, detail="Session store not found")
-        with sqlite3.connect(str(db_path)) as conn:
-            cur = conn.execute("SELECT state_json FROM sessions WHERE session_id = ?", (session_id,))
-            row = cur.fetchone()
-            if not row:
-                raise HTTPException(status_code=404, detail="PRISM Session ID not found")
-            try:
-                state = json.loads(row[0])
-            except json.JSONDecodeError:
-                raise HTTPException(status_code=500, detail="Corrupted session state")
-        # Ensure only expected fields are returned
-        response = {
-            "session_id": session_id,
-            "sources": state.get("sources", {}),
-            "active_source_name": state.get("active_source_name"),
-            "modeling": state.get("modeling", {}),
-        }
-        return response
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to load session {session_id}: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Failed to load session")
 
 # @app.post("/export_insights_report_pdf", tags=["Data Insights"])
 # async def export_insights_report_pdf(request: ExportReportRequest):
