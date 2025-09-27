@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Box, Button, Code, Flex, Heading, Spinner, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Textarea, useToast, Select, Image } from "@chakra-ui/react";
 import { useAppStore, setModeling } from "../state/appStore";
-import { prismApi, getArtifactUrl, downloadFile, getPlotUrl } from "../api/client";
+import { startModelingPipeline, executeModelingPipeline, getArtifactUrl, downloadFile, getPlotUrl } from "../api/client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -16,18 +16,23 @@ export default function ModelingPage() {
   const analyzedSources = Object.entries(sources).filter(([_, v]) => v.analyzed).map(([k]) => k);
 
   async function generate() {
-    if (!selected || !task) return;
+    if (!selected || !task) {
+      toast({ 
+        status: "warning", 
+        title: "Missing information",
+        description: "Please select a data source and enter a modeling objective."
+      });
+      return;
+    }
+    
     setLoading(true);
     try {
       const source_info = sources[selected];
-      const payload = {
-        session_id,
-        task_description: task,
-        source_config: source_info.config,
-        data_context: source_info.data_context,
-      };
-      const res = await prismApi.post("/start_modeling_pipeline", payload);
-      const result = res.data;
+      
+      console.log("Generating ML pipeline with:", { session_id, task, config: source_info.config, data_context: source_info.data_context });
+      const result = await startModelingPipeline(session_id, task, source_info.config, source_info.data_context);
+      
+      console.log("Generation response:", result);
       
       // Save to global state for persistence
       setModeling({
@@ -39,8 +44,19 @@ export default function ModelingPage() {
         step_log: result.step_log || [],
         download_path: result.download_path || null,
       });
+      
+      toast({ 
+        status: "success", 
+        title: "ML Pipeline Generated!",
+        description: "Review the generated code and proceed to execution."
+      });
     } catch (e: any) {
-      toast({ status: "error", title: e?.response?.data?.detail ?? String(e) });
+      console.error("Generation error:", e);
+      toast({ 
+        status: "error", 
+        title: "Generation failed",
+        description: e?.response?.data?.detail ?? String(e)
+      });
     } finally {
       setLoading(false);
     }
@@ -49,14 +65,30 @@ export default function ModelingPage() {
   async function execute() {
     setExecLoading(true);
     try {
-      const res = await prismApi.post("/execute_modeling_pipeline", { session_id });
+      const result = await executeModelingPipeline(session_id);
       
       // Save execution results to global state
       setModeling({
-        execution_results: res.data,
+        execution_results: {
+          execution_log: result.execution_log || "",
+          artifacts: result.artifacts || {},
+          step_log: result.step_log || [],
+          plots: result.plots || []
+        },
+      });
+      
+      toast({ 
+        status: "success", 
+        title: "Pipeline executed successfully!",
+        description: "Check the results and artifacts below."
       });
     } catch (e: any) {
-      toast({ status: "error", title: e?.response?.data?.detail ?? String(e) });
+      console.error("Execution error:", e);
+      toast({ 
+        status: "error", 
+        title: "Execution failed",
+        description: e?.response?.data?.detail ?? String(e)
+      });
     } finally {
       setExecLoading(false);
     }
@@ -328,12 +360,14 @@ export default function ModelingPage() {
             />
           </Box>
           
-          {/* Display plots if they exist */}
-          {modeling.execution_results.plots && modeling.execution_results.plots.length > 0 && (
+          {/* Display plots if they exist - check for plots in artifacts */}
+          {modeling.execution_results.artifacts && Object.keys(modeling.execution_results.artifacts).some(key => key.endsWith('.png') || key.endsWith('.jpg') || key.endsWith('.jpeg')) && (
             <Box mb={6}>
               <Heading size="md" mb={4} color="prismTeal.300" fontWeight="bold">📊 Generated Plots</Heading>
               <Flex direction="column" gap={4}>
-                {modeling.execution_results.plots.map((plotPath: string, index: number) => (
+                {Object.entries(modeling.execution_results.artifacts)
+                  .filter(([name, _]) => name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.jpeg'))
+                  .map(([name, path], index) => (
                   <Box 
                     key={index} 
                     bg="linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)"
@@ -345,10 +379,10 @@ export default function ModelingPage() {
                     boxShadow="0 2px 8px rgba(0,0,0,0.1)"
                   >
                     <Text fontSize="sm" color="prismTeal.300" mb={3} fontWeight="semibold">
-                      📈 Plot {index + 1}: {plotPath}
+                      📈 Plot {index + 1}: {name}
                     </Text>
                     <Image 
-                      src={getPlotUrl(plotPath)} 
+                      src={getArtifactUrl(path as string)} 
                       alt={`Generated plot ${index + 1}`} 
                       maxH="500px" 
                       objectFit="contain"
@@ -358,10 +392,10 @@ export default function ModelingPage() {
                       boxShadow="0 4px 12px rgba(0,0,0,0.1)"
                       onError={(e) => {
                         console.error('❌ Plot load error:', e);
-                        console.error('Failed URL:', getPlotUrl(plotPath));
+                        console.error('Failed URL:', getArtifactUrl(path as string));
                       }}
                       onLoad={() => {
-                        console.log('✅ Plot loaded successfully:', getPlotUrl(plotPath));
+                        console.log('✅ Plot loaded successfully:', getArtifactUrl(path as string));
                       }}
                     />
                   </Box>
@@ -370,7 +404,7 @@ export default function ModelingPage() {
             </Box>
           )}
           
-          {modeling.execution_results.artifacts ? (
+          {modeling.execution_results.artifacts && Object.keys(modeling.execution_results.artifacts).length > 0 ? (
             <Box 
               bg="linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(34,197,94,0.05) 100%)"
               borderRadius="lg"

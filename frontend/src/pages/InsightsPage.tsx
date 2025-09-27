@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Box, Button, Flex, Heading, Image, Spinner, Text, Textarea, useToast, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, VStack } from "@chakra-ui/react";
 import { useAppStore, updateSource } from "../state/appStore";
-import { prismApi, getPlotUrl } from "../api/client";
+import { prismApi, getPlotUrl, exportInsightsReport, downloadMarkdownReport } from "../api/client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -11,6 +11,7 @@ export default function InsightsPage() {
   const active = active_source_name ? sources[active_source_name] : null;
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const historyStr = useMemo(() => {
     if (!active?.messages) return "";
@@ -46,6 +47,21 @@ export default function InsightsPage() {
     }
   }
 
+  async function exportReport() {
+    if (!active_source_name || !active?.messages) return;
+    setExporting(true);
+    try {
+      const result = await exportInsightsReport(active_source_name, active.messages);
+      const filename = `${active_source_name}_insights_report_${new Date().toISOString().split('T')[0]}.md`;
+      downloadMarkdownReport(result.report_markdown, filename);
+      toast({ status: "success", title: "Report exported successfully!" });
+    } catch (e: any) {
+      toast({ status: "error", title: e?.response?.data?.detail ?? "Export failed" });
+    } finally {
+      setExporting(false);
+    }
+  }
+
   if (!active_source_name) {
     return <Box><Text color="gray.400">Add and analyze a data source from the sidebar to begin.</Text></Box>;
   }
@@ -62,9 +78,33 @@ export default function InsightsPage() {
         backdropFilter="blur(20px)"
         boxShadow="0 4px 16px rgba(0,0,0,0.1)"
       >
-        <Heading size="lg" color="white" mb={2} fontWeight="bold">
-          💬 Chat with: {active_source_name}
-        </Heading>
+        <Flex justifyContent="space-between" alignItems="center" mb={2}>
+          <Heading size="lg" color="white" fontWeight="bold">
+            💬 Chat with: {active_source_name}
+          </Heading>
+          {active?.messages && active.messages.length > 0 && active.messages.some(m => m.role === "assistant") && (
+            <Button
+              onClick={exportReport}
+              isLoading={exporting}
+              loadingText="Exporting..."
+              size="sm"
+              variant="outline"
+              color="white"
+              borderColor="whiteAlpha.300"
+              _hover={{
+                bg: "whiteAlpha.100",
+                borderColor: "whiteAlpha.400",
+                transform: "translateY(-1px)"
+              }}
+              _active={{
+                transform: "translateY(0px)"
+              }}
+              transition="all 0.2s ease"
+            >
+              📄 Export Report
+            </Button>
+          )}
+        </Flex>
         <Text color="whiteAlpha.700" fontSize="sm" fontWeight="medium">
           Ask questions about your data and get AI-powered insights
         </Text>
@@ -121,9 +161,7 @@ export default function InsightsPage() {
                   backdropFilter="blur(20px)"
                   boxShadow="0 2px 8px rgba(0,0,0,0.1)"
                 >
-                  <Text fontSize="sm" color="prismTeal.300" mb={3} fontWeight="semibold">
-                    📊 Generated Visualization
-                  </Text>
+                  
                   <Image 
                     src={getPlotUrl(m.plot_path)} 
                     alt="Generated plot" 
@@ -158,7 +196,7 @@ export default function InsightsPage() {
                       >
                         <Box flex="1" textAlign="left">
                           <Text fontSize="sm" fontWeight="semibold" color="prismTeal.300">
-                            🔍 Agent Analysis ({m.step_log.length} steps)
+                            🔍 Agent Activity ({m.step_log.length} steps)
                           </Text>
                         </Box>
                         <AccordionIcon />

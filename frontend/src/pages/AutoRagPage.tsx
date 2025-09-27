@@ -637,75 +637,340 @@ function ChatView({ ragId, onBack }: { ragId: string; onBack: () => void }) {
 
       <Flex gap={6}>
         <Box w="320px">
-          <Heading size="sm">Knowledge Base</Heading>
-          <Text fontSize="sm" color="gray.500">Manage documents for this RAG.</Text>
-          <Input type="file" ref={fileInputRef} multiple mt={2} onChange={(e) => onUploadFiles(e.target.files)} />
-          <Box mt={3}>
-            <Heading size="xs">Ingested Documents</Heading>
+          <Heading size="sm" color="white" mb={2} fontWeight="bold" display="flex" alignItems="center" gap={2}>
+            <Text>📚</Text>
+            <Text>Knowledge Base</Text>
+          </Heading>
+          <Text fontSize="sm" color="whiteAlpha.600" mb={4} fontWeight="medium">
+            Upload documents to enhance this RAG's knowledge
+          </Text>
+          
+          {/* Beautiful File Upload Area */}
+          <Box
+            position="relative"
+            bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
+            borderRadius="xl"
+            border="2px dashed"
+            borderColor="whiteAlpha.300"
+            p={6}
+            textAlign="center"
+            transition="all 0.3s ease"
+            _hover={{
+              borderColor: "brand.400",
+              bg: "rgba(132,64,255,0.1)",
+              transform: "translateY(-2px)",
+              boxShadow: "0 8px 24px rgba(132,64,255,0.2)"
+            }}
+            _active={{
+              transform: "translateY(0px)"
+            }}
+          >
+            <VStack spacing={4}>
+              <Box fontSize="3xl" opacity={0.8}>
+                📄
+              </Box>
+              <VStack spacing={2}>
+                <Text color="white" fontSize="md" fontWeight="semibold">
+                  Drop files here or click to browse
+                </Text>
+                <Text color="whiteAlpha.600" fontSize="sm">
+                  Supports PDF, TXT, DOC, DOCX • Multiple files allowed
+                </Text>
+              </VStack>
+              <Box
+                bg="linear-gradient(135deg, brand.500 0%, brand.400 100%)"
+                color="white"
+                px={6}
+                py={2}
+                borderRadius="lg"
+                fontSize="sm"
+                fontWeight="semibold"
+                boxShadow="0 4px 12px rgba(132,64,255,0.3)"
+                _hover={{
+                  bg: "linear-gradient(135deg, brand.600 0%, brand.500 100%)",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 6px 16px rgba(132,64,255,0.4)"
+                }}
+                transition="all 0.2s ease"
+              >
+                Choose Files
+              </Box>
+              <Input
+                type="file"
+                ref={fileInputRef}
+                multiple
+                onChange={(e) => onUploadFiles(e.target.files)}
+                position="absolute"
+                top={0}
+                left={0}
+                width="100%"
+                height="100%"
+                opacity={0}
+                cursor="pointer"
+                zIndex={1}
+              />
+            </VStack>
+          </Box>
+          <Box mt={6}>
+            <Heading size="sm" color="white" mb={3} fontWeight="bold" display="flex" alignItems="center" gap={2}>
+              <Text>📋</Text>
+              <Text>Ingested Documents</Text>
+            </Heading>
             {loadingDocs ? (
-              <Spinner size="sm" mt={2} />
+              <Box 
+                bg="linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)"
+                borderRadius="lg"
+                p={4}
+                textAlign="center"
+                border="1px solid"
+                borderColor="whiteAlpha.200"
+              >
+                <Spinner size="sm" color="brand.400" />
+                <Text color="whiteAlpha.600" fontSize="sm" mt={2}>Loading documents...</Text>
+              </Box>
             ) : documents.length === 0 ? (
-              <Text mt={2} color="gray.400">No documents have been ingested yet.</Text>
+              <Box 
+                bg="linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)"
+                borderRadius="lg"
+                p={6}
+                textAlign="center"
+                border="1px solid"
+                borderColor="whiteAlpha.200"
+              >
+                <Text color="whiteAlpha.600" fontSize="sm" fontWeight="medium">
+                  📄 No documents uploaded yet
+                </Text>
+                <Text color="whiteAlpha.500" fontSize="xs" mt={1}>
+                  Upload files above to get started
+                </Text>
+              </Box>
             ) : (
-              <Box mt={2} display="grid" gap={2}>
+              <Box display="grid" gap={3}>
                 {documents.map((doc: any) => {
                   const statusIcon = doc.status === 'COMPLETED' ? '✅' : (['PROCESSING','PENDING'].includes(doc.status) ? '⏳' : '❌');
+                  const statusColor = doc.status === 'COMPLETED' ? 'prismTeal.300' : (['PROCESSING','PENDING'].includes(doc.status) ? 'yellow.400' : 'red.400');
                   const dt = doc.created_at ? new Date(doc.created_at).toLocaleString() : '';
-                  return <Box key={doc.id} p={2} borderWidth="1px" borderRadius="md">{statusIcon} {doc.file_name} <Text as="span" color="gray.500">({dt})</Text></Box>;
+                  return (
+                    <Box 
+                      key={doc.id} 
+                      bg="linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)"
+                      p={4} 
+                      borderRadius="lg"
+                      border="1px solid"
+                      borderColor="whiteAlpha.200"
+                      backdropFilter="blur(20px)"
+                      boxShadow="0 2px 8px rgba(0,0,0,0.1)"
+                      _hover={{
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                        transform: "translateY(-1px)",
+                        borderColor: "whiteAlpha.300"
+                      }}
+                      transition="all 0.3s ease"
+                    >
+                      <Flex alignItems="center" gap={3}>
+                        <Text fontSize="lg">{statusIcon}</Text>
+                        <Box flex="1">
+                          <Text color="white" fontSize="sm" fontWeight="semibold" noOfLines={1}>
+                            {doc.file_name}
+                          </Text>
+                          <Text color="whiteAlpha.600" fontSize="xs">
+                            {dt}
+                          </Text>
+                        </Box>
+                        <Text color={statusColor} fontSize="xs" fontWeight="medium">
+                          {doc.status}
+                        </Text>
+                      </Flex>
+                    </Box>
+                  );
                 })}
               </Box>
             )}
           </Box>
         </Box>
 
-        <Box flex="1">
+        <Box flex="1" overflowY="auto" pr={2}>
           {(history ?? []).map((m: any, idx: number) => (
-            <Box key={idx} p={3} borderWidth="1px" borderRadius="md" mb={2} bg={m.role === "assistant" ? "whiteAlpha.50" : "transparent"}>
-              <Text fontWeight="bold" mb={1}>{m.role === "assistant" ? "Assistant" : "You"}</Text>
-              <Box>
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {m.content}
-                </ReactMarkdown>
-              </Box>
-              {m.sources && m.sources.length > 0 && (
-                <Box mt={3}>
-                  <Accordion allowToggle>
-                    <AccordionItem border="none">
-                      <AccordionButton px={0} py={2} _hover={{ bg: "transparent" }}>
-                        <Box flex="1" textAlign="left">
-                          <Text fontSize="sm" fontWeight="medium" color="prismTeal.300">
-                            📚 Sources ({m.sources.length} documents)
-                          </Text>
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                      <AccordionPanel px={0} pb={0}>
-                        <Box bg="whiteAlpha.50" p={3} borderRadius="md" borderWidth="1px" borderColor="whiteAlpha.200">
-                          <VStack align="stretch" spacing={3}>
-                            {m.sources.map((s: any, i: number) => (
-                              <Box key={i} p={3} bg="blackAlpha.100" borderRadius="md" borderLeft="3px solid" borderLeftColor="prismTeal.400">
-                                <Text fontSize="sm" fontWeight="medium" color="prismTeal.200" mb={1}>
-                                  📄 Source {i+1}: {s.document_name ?? 'Unknown Document'}
-                                </Text>
-                                <Text fontSize="xs" color="gray.300" fontFamily="mono" whiteSpace="pre-wrap">
-                                  {s.content_snippet ?? 'No content snippet available'}
-                                </Text>
-                              </Box>
-                            ))}
-                          </VStack>
-                        </Box>
-                      </AccordionPanel>
-                    </AccordionItem>
-                  </Accordion>
+            <Box 
+              key={idx} 
+              mb={6}
+              display="flex"
+              justifyContent={m.role === "assistant" ? "flex-start" : "flex-end"}
+            >
+              <Box
+                maxW="80%"
+                bg={m.role === "assistant" 
+                  ? "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
+                  : "linear-gradient(135deg, brand.500 0%, brand.400 100%)"
+                }
+                color={m.role === "assistant" ? "white" : "white"}
+                p={5}
+                borderRadius={m.role === "assistant" ? "20px 20px 20px 8px" : "20px 20px 8px 20px"}
+                border="1px solid"
+                borderColor={m.role === "assistant" ? "whiteAlpha.200" : "brand.400"}
+                backdropFilter="blur(20px)"
+                boxShadow={m.role === "assistant" 
+                  ? "0 4px 16px rgba(0,0,0,0.1)"
+                  : "0 4px 16px rgba(132,64,255,0.3)"
+                }
+                position="relative"
+                _hover={{
+                  transform: "translateY(-1px)",
+                  boxShadow: m.role === "assistant" 
+                    ? "0 6px 20px rgba(0,0,0,0.15)"
+                    : "0 6px 20px rgba(132,64,255,0.4)"
+                }}
+                transition="all 0.3s ease"
+              >
+                <Text 
+                  fontWeight="bold" 
+                  mb={3} 
+                  fontSize="sm"
+                  color={m.role === "assistant" ? "prismTeal.300" : "white"}
+                  display="flex"
+                  alignItems="center"
+                  gap={2}
+                >
+                  {m.role === "assistant" ? "🔮 Prism" : "👤 You"}
+                </Text>
+                <Box>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {m.content}
+                  </ReactMarkdown>
                 </Box>
-              )}
+                {m.sources && m.sources.length > 0 && (
+                  <Box mt={4}>
+                    <Accordion allowToggle>
+                      <AccordionItem border="none">
+                        <AccordionButton 
+                          px={0} 
+                          py={3} 
+                          _hover={{ bg: "transparent" }}
+                          borderRadius="lg"
+                          bg="linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)"
+                          border="1px solid"
+                          borderColor="whiteAlpha.200"
+                        >
+                          <Box flex="1" textAlign="left">
+                            <Text fontSize="sm" fontWeight="semibold" color="prismTeal.300" display="flex" alignItems="center" gap={2}>
+                              <Text>📚</Text>
+                              <Text>Sources ({m.sources.length} documents)</Text>
+                            </Text>
+                          </Box>
+                          <AccordionIcon color="prismTeal.300" />
+                        </AccordionButton>
+                        <AccordionPanel px={0} pb={0} mt={2}>
+                          <Box 
+                            bg="linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)" 
+                            p={4} 
+                            borderRadius="lg" 
+                            border="1px solid" 
+                            borderColor="whiteAlpha.200"
+                            backdropFilter="blur(20px)"
+                          >
+                            <VStack align="stretch" spacing={4}>
+                              {m.sources.map((s: any, i: number) => (
+                                <Box 
+                                  key={i} 
+                                  p={4} 
+                                  bg="linear-gradient(135deg, rgba(20,184,166,0.1) 0%, rgba(20,184,166,0.05) 100%)" 
+                                  borderRadius="lg" 
+                                  border="1px solid" 
+                                  borderColor="prismTeal.400"
+                                  _hover={{
+                                    bg: "linear-gradient(135deg, rgba(20,184,166,0.15) 0%, rgba(20,184,166,0.08) 100%)",
+                                    transform: "translateY(-1px)",
+                                    boxShadow: "0 4px 12px rgba(20,184,166,0.2)"
+                                  }}
+                                  transition="all 0.3s ease"
+                                >
+                                  <Text fontSize="sm" fontWeight="semibold" color="prismTeal.200" mb={2} display="flex" alignItems="center" gap={2}>
+                                    <Text>📄</Text>
+                                    <Text>Source {i+1}: {s.document_name ?? 'Unknown Document'}</Text>
+                                  </Text>
+                                  <Text fontSize="xs" color="whiteAlpha.500" lineHeight="1.5" bg="rgba(0,0,0,0.2)" p={3} borderRadius="md" fontFamily="mono" whiteSpace="pre-wrap">
+                                    {s.content_snippet ?? 'No content snippet available'}
+                                  </Text>
+                                </Box>
+                              ))}
+                            </VStack>
+                          </Box>
+                        </AccordionPanel>
+                      </AccordionItem>
+                    </Accordion>
+                  </Box>
+                )}
+              </Box>
             </Box>
           ))}
 
-          <Flex gap={2} mt={3}>
-            <Textarea placeholder="Ask a question about your documents..." value={input} onChange={(e) => setInput(e.target.value)} />
-            <Button onClick={send} disabled={!input || sending} minW="120px">{sending ? <Spinner size="sm" /> : "Send"}</Button>
-          </Flex>
+          <Box 
+            mt={6}
+            bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
+            borderRadius="xl"
+            p={4}
+            border="1px solid"
+            borderColor="whiteAlpha.200"
+            backdropFilter="blur(20px)"
+            boxShadow="0 4px 16px rgba(0,0,0,0.1)"
+          >
+            <Flex gap={3} align="end">
+              <Textarea 
+                placeholder="Ask a question about your documents..." 
+                value={input} 
+                onChange={(e) => setInput(e.target.value)}
+                bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
+                border="1px solid"
+                borderColor="whiteAlpha.200"
+                color="white"
+                _placeholder={{ color: "whiteAlpha.600" }}
+                _focus={{
+                  borderColor: "brand.400",
+                  boxShadow: "0 0 0 1px rgba(132,64,255,0.3)",
+                  bg: "rgba(255,255,255,0.15)"
+                }}
+                _hover={{
+                  borderColor: "whiteAlpha.300",
+                  bg: "rgba(255,255,255,0.1)"
+                }}
+                transition="all 0.3s ease"
+                resize="vertical"
+                minH="60px"
+                maxH="120px"
+              />
+              <Button 
+                onClick={send} 
+                disabled={!input || sending} 
+                minW="120px"
+                bg="linear-gradient(135deg, brand.500 0%, brand.400 100%)"
+                color="white"
+                fontWeight="semibold"
+                borderRadius="lg"
+                py={6}
+                _hover={{ 
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 6px 16px rgba(132,64,255,0.4)",
+                  bg: "linear-gradient(135deg, brand.600 0%, brand.500 100%)"
+                }}
+                _active={{
+                  transform: "translateY(0px)"
+                }}
+                _disabled={{
+                  bg: "whiteAlpha.200",
+                  color: "whiteAlpha.500",
+                  cursor: "not-allowed",
+                  _hover: {
+                    transform: "none",
+                    boxShadow: "none"
+                  }
+                }}
+                transition="all 0.3s ease"
+                leftIcon={sending ? <Spinner size="sm" /> : <Text>🚀</Text>}
+              >
+                {sending ? "Sending..." : "Send"}
+              </Button>
+            </Flex>
+          </Box>
         </Box>
       </Flex>
     </Flex>

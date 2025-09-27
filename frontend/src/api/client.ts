@@ -58,3 +58,36 @@ export function downloadFile(url: string, filename: string) {
   link.click();
   document.body.removeChild(link);
 }
+
+export async function exportInsightsReport(sourceName: string, chatHistory: Array<{ role: string; content: string; plot_path?: string; step_log?: string[] }>) {
+  const res = await prismApi.post("/export_insights_report", {
+    source_name: sourceName,
+    chat_history: chatHistory
+  });
+  return res.data;
+}
+
+export function downloadMarkdownReport(markdownContent: string, filename: string) {
+  const blob = new Blob([markdownContent], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  downloadFile(url, filename);
+  URL.revokeObjectURL(url);
+}
+
+// Modeling API functions
+export async function startModelingPipeline(sessionId: string, taskDescription: string, sourceConfig: any, dataContext: any) {
+  const res = await prismApi.post("/start_modeling_pipeline", {
+    session_id: sessionId,
+    task_description: taskDescription,
+    source_config: sourceConfig,
+    data_context: dataContext,
+  });
+  return res.data;
+}
+
+export async function executeModelingPipeline(sessionId: string) {
+  const res = await prismApi.post("/execute_modeling_pipeline", {
+    session_id: sessionId,
+  });
+  return res.data;
+}

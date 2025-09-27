@@ -51,6 +51,9 @@ export default function Sidebar() {
   const [resumeSessionId, setResumeSessionId] = useState("");
   const [analyzingSource, setAnalyzingSource] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [isConfigureSectionOpen, setIsConfigureSectionOpen] = useState(true);
+  const [isExistingSourcesOpen, setIsExistingSourcesOpen] = useState(true);
+  const [isSessionControlOpen, setIsSessionControlOpen] = useState(true);
 
   // Mirror prism.py defaults for DB connections
   function applyDbDefaults(nextType: "postgresql" | "mysql" | "sqlite") {
@@ -231,50 +234,48 @@ export default function Sidebar() {
           />
         </Box>
 
-        {/* Add New Data Source */}
-        <Box
-          bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-          borderRadius="xl"
-          p={6}
-          border="1px solid"
-          borderColor="whiteAlpha.200"
-          backdropFilter="blur(20px)"
-          boxShadow="0 4px 16px rgba(0,0,0,0.1)"
-          position="relative"
-          zIndex={2}
-          _hover={{
-            boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-            borderColor: "whiteAlpha.300",
-            transform: "translateY(-2px)",
-          }}
-          transition="all 0.3s ease"
-        >
-          <Accordion allowToggle defaultIndex={0}>
-            <AccordionItem border="none">
-              <AccordionButton
-                _hover={{ bg: "transparent" }}
-                px={5}
-                py={4}
-                borderRadius="lg"
-                bg="linear-gradient(135deg, brand.500 0%, brand.400 100%)"
-                color="white"
-                fontWeight="bold"
-                boxShadow="0 4px 16px rgba(132,64,255,0.3)"
-                border="1px solid"
-                borderColor="brand.400"
-                _expanded={{ 
-                  bg: "linear-gradient(135deg, brand.600 0%, brand.500 100%)",
-                  boxShadow: "0 6px 20px rgba(132,64,255,0.4)",
-                  transform: "translateY(-1px)",
-                }}
-                transition="all 0.3s ease"
-              >
-                <Box flex="1" textAlign="left" display="flex" alignItems="center" gap={2}>
-                  <Text fontSize="md" fontWeight="semibold">➕ Add New Data Source</Text>
-                </Box>
-                <AccordionIcon />
-              </AccordionButton>
-              <AccordionPanel px={0} pb={0}>
+        {/* Configure New Data Sources */}
+        <Box>
+          <Flex 
+            alignItems="center" 
+            justifyContent="space-between" 
+            mb={4}
+            cursor="pointer"
+            onClick={() => setIsConfigureSectionOpen(!isConfigureSectionOpen)}
+            _hover={{ opacity: 0.8 }}
+            transition="opacity 0.2s ease"
+          >
+            <Heading size="md" color="white" fontWeight="bold">
+              Configure Data Sources
+            </Heading>
+            <Box
+              transform={isConfigureSectionOpen ? "rotate(180deg)" : "rotate(0deg)"}
+              transition="transform 0.3s ease"
+              color="white"
+              fontSize="lg"
+            >
+              ▲
+            </Box>
+          </Flex>
+          
+          {isConfigureSectionOpen && (
+            <Box
+              bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
+              borderRadius="xl"
+              p={6}
+              border="1px solid"
+              borderColor="whiteAlpha.200"
+              backdropFilter="blur(20px)"
+              boxShadow="0 4px 16px rgba(0,0,0,0.1)"
+              position="relative"
+              zIndex={2}
+              _hover={{
+                boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                borderColor: "whiteAlpha.300",
+                transform: "translateY(-2px)",
+              }}
+              transition="all 0.3s ease"
+            >
                 <Tabs variant="enclosed" colorScheme="teal" mt={4}>
                   <TabList 
                     bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)" 
@@ -334,27 +335,110 @@ export default function Sidebar() {
                         </FormControl>
 
                         <FormControl>
-                          <FormLabel color="white" fontSize="sm" fontWeight="semibold" mb={2}>
-                            Upload an Excel file
+                          <FormLabel color="white" fontSize="sm" fontWeight="semibold" mb={3} display="flex" alignItems="center" gap={2}>
+                            <Text>📊</Text>
+                            <Text>Upload Excel File</Text>
                           </FormLabel>
-                          <Input
-                            type="file"
-                            accept=".xlsx"
-                            onChange={handleFileChange}
-                            variant="modern"
-                            size="sm"
-                            p={2}
-                          />
+                          <Box
+                            position="relative"
+                            bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
+                            borderRadius="xl"
+                            border="2px dashed"
+                            borderColor="whiteAlpha.300"
+                            p={8}
+                            textAlign="center"
+                            transition="all 0.3s ease"
+                            _hover={{
+                              borderColor: "prismTeal.400",
+                              bg: "rgba(20,184,166,0.1)",
+                              transform: "translateY(-2px)",
+                              boxShadow: "0 8px 24px rgba(20,184,166,0.2)"
+                            }}
+                            _active={{
+                              transform: "translateY(0px)"
+                            }}
+                          >
+                            <VStack spacing={4}>
+                              <Box fontSize="4xl" opacity={0.8}>
+                                📁
+                              </Box>
+                              <VStack spacing={2}>
+                                <Text color="white" fontSize="md" fontWeight="semibold">
+                                  {fileToUpload ? fileToUpload.name : "Choose Excel file to upload"}
+                                </Text>
+                                <Text color="whiteAlpha.600" fontSize="sm">
+                                  Supports .xlsx files only • Max 10MB
+                                </Text>
+                                {fileToUpload && (
+                                  <Text color="prismTeal.300" fontSize="xs" fontWeight="medium">
+                                    ✓ File selected • {(fileToUpload.size / 1024 / 1024).toFixed(2)} MB
+                                  </Text>
+                                )}
+                              </VStack>
+                              <Box
+                                bg="linear-gradient(135deg, prismTeal.500 0%, prismTeal.400 100%)"
+                                color="white"
+                                px={6}
+                                py={2}
+                                borderRadius="lg"
+                                fontSize="sm"
+                                fontWeight="semibold"
+                                boxShadow="0 4px 12px rgba(20,184,166,0.3)"
+                                _hover={{
+                                  bg: "linear-gradient(135deg, prismTeal.600 0%, prismTeal.500 100%)",
+                                  transform: "translateY(-1px)",
+                                  boxShadow: "0 6px 16px rgba(20,184,166,0.4)"
+                                }}
+                                transition="all 0.2s ease"
+                              >
+                                Browse Files
+                              </Box>
+                              <Input
+                                type="file"
+                                accept=".xlsx"
+                                onChange={handleFileChange}
+                                position="absolute"
+                                top={0}
+                                left={0}
+                                width="100%"
+                                height="100%"
+                                opacity={0}
+                                cursor="pointer"
+                                zIndex={1}
+                              />
+                            </VStack>
+                          </Box>
                         </FormControl>
 
                         <Button
-                          colorScheme="teal"
                           onClick={handleAddFileSource}
                           isDisabled={!fileSourceName || !fileToUpload}
-                          size="sm"
-                          borderRadius="lg"
-                          _hover={{ transform: "translateY(-1px)" }}
-                          variant="solid"
+                          size="lg"
+                          borderRadius="xl"
+                          bg="linear-gradient(135deg, brand.500 0%, brand.400 100%)"
+                          color="white"
+                          fontWeight="bold"
+                          fontSize="md"
+                          py={6}
+                          _hover={{ 
+                            transform: "translateY(-2px)",
+                            boxShadow: "0 8px 24px rgba(132,64,255,0.4)",
+                            bg: "linear-gradient(135deg, brand.600 0%, brand.500 100%)"
+                          }}
+                          _active={{
+                            transform: "translateY(0px)"
+                          }}
+                          _disabled={{
+                            bg: "whiteAlpha.200",
+                            color: "whiteAlpha.500",
+                            cursor: "not-allowed",
+                            _hover: {
+                              transform: "none",
+                              boxShadow: "none"
+                            }
+                          }}
+                          transition="all 0.3s ease"
+                          leftIcon={<Text fontSize="lg">🚀</Text>}
                         >
                           Add File Source
                         </Button>
@@ -533,19 +617,38 @@ export default function Sidebar() {
                     </TabPanel>
                   </TabPanels>
                 </Tabs>
-              </AccordionPanel>
-            </AccordionItem>
-          </Accordion>
-      </Box>
+            </Box>
+          )}
+        </Box>
 
         <Divider borderColor="whiteAlpha.300" />
 
         {/* Configured Data Sources */}
         <Box>
-          <Heading size="md" color="white" mb={4} fontWeight="bold">
-            Data Sources
-          </Heading>
-          {Object.keys(sources).length === 0 ? (
+          <Flex 
+            alignItems="center" 
+            justifyContent="space-between" 
+            mb={4}
+            cursor="pointer"
+            onClick={() => setIsExistingSourcesOpen(!isExistingSourcesOpen)}
+            _hover={{ opacity: 0.8 }}
+            transition="opacity 0.2s ease"
+          >
+            <Heading size="md" color="white" fontWeight="bold">
+              Existing Data Sources
+            </Heading>
+            <Box
+              transform={isExistingSourcesOpen ? "rotate(180deg)" : "rotate(0deg)"}
+              transition="transform 0.3s ease"
+              color="white"
+              fontSize="lg"
+            >
+              ▲
+            </Box>
+          </Flex>
+          {isExistingSourcesOpen && (
+            <>
+              {Object.keys(sources).length === 0 ? (
             <Box 
               bg="linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)"
               borderRadius="lg"
@@ -609,6 +712,8 @@ export default function Sidebar() {
                 </Box>
               ))}
             </VStack>
+              )}
+            </>
           )}
         </Box>
 
@@ -616,10 +721,29 @@ export default function Sidebar() {
 
         {/* Session Control */}
         <Box>
-          <Heading size="md" color="white" mb={4} fontWeight="bold">
-            Session Control
-          </Heading>
-          <VStack spacing={4} align="stretch">
+          <Flex 
+            alignItems="center" 
+            justifyContent="space-between" 
+            mb={4}
+            cursor="pointer"
+            onClick={() => setIsSessionControlOpen(!isSessionControlOpen)}
+            _hover={{ opacity: 0.8 }}
+            transition="opacity 0.2s ease"
+          >
+            <Heading size="md" color="white" fontWeight="bold">
+              Session Control
+            </Heading>
+            <Box
+              transform={isSessionControlOpen ? "rotate(180deg)" : "rotate(0deg)"}
+              transition="transform 0.3s ease"
+              color="white"
+              fontSize="lg"
+            >
+              ▲
+            </Box>
+          </Flex>
+          {isSessionControlOpen && (
+            <VStack spacing={4} align="stretch">
             <Button
               colorScheme="red"
               variant="outline"
@@ -721,8 +845,9 @@ export default function Sidebar() {
                 </Button>
               </VStack>
             </Box>
-          </VStack>
-      </Box>
+            </VStack>
+          )}
+        </Box>
       </VStack>
     </Box>
   );

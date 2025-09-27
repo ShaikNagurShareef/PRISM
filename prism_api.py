@@ -18,6 +18,7 @@ import sqlite3
 # --- Third-party Imports ---
 from fastapi import FastAPI, HTTPException, Body, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
@@ -506,6 +507,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount static files for serving plots and artifacts
+app.mount("/static", StaticFiles(directory="data"), name="static")
 
 class ProcessSourceRequest(BaseModel): source_config: Dict[str, Any]
 class InsightsRequest(BaseModel): session_id: str; question: str; history: str; source_config: Dict[str, Any]; data_context: str; summary: str
