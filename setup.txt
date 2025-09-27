@@ -1,0 +1,8 @@
+uvicorn agent:app --reload
+uvicorn src.api.main:app --reload --port 8001
+streamlit run prism.py
+
+
+uvicorn prism_api:app --reload
+uvicorn src.api.main:app --reload --port 8001
+streamlit run prism_ui.py

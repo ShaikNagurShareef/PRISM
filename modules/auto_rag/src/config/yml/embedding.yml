@@ -1,0 +1,31 @@
+available_embedders:
+  openai:
+    text-embedding-3-large: 
+      model_name: "text-embedding-3-large"
+      provider: "openai"
+      dimensions: 3072
+      class_path: "src.service.modules.embedders.litellm_embedder.LiteLLMEmbedder"
+    text-embedding-3-small: 
+      model_name: "text-embedding-3-small"
+      provider: "openai"
+      dimensions: 1536
+      class_path: "src.service.modules.embedders.litellm_embedder.LiteLLMEmbedder"
+    text-embedding-ada-002: 
+      model_name: "text-embedding-ada-002"
+      provider: "openai"
+      dimensions: 1536
+      class_path: "src.service.modules.embedders.litellm_embedder.LiteLLMEmbedder"
+
+  huggingface:
+    # This model runs locally using the sentence-transformers library
+    all-mpnet-base-v2: 
+      model_name: "sentence-transformers/all-mpnet-base-v2"
+      provider: "huggingface"
+      dimensions: 768
+      class_path: "src.service.modules.embedders.huggingface_embedder.HuggingFaceEmbedder"
+    # Another popular local model
+    bge-large-en-v1.5:
+      model_name: "BAAI/bge-large-en-v1.5"
+      provider: "huggingface"
+      dimensions: 1024
+      class_path: "src.service.modules.embedders.huggingface_embedder.HuggingFaceEmbedder"

@@ -1,0 +1,54 @@
+# Core Frameworks
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+
+# Database
+sqlalchemy
+sqlite-vss # For basic vector storage integration (optional, but useful for testing)
+
+# RAG Libraries (Initial set)
+langchain # For high-level RAG orchestration and agents
+llama-index # Alternative/complementary for parsing/chunking (optional, but good for multimodal)
+unstructured # For advanced document parsing (PDF, DOCX, etc.)
+
+# LLM/Embedding Providers (We will use Litellm for unified API calls)
+litellm
+openai
+
+# Async Task Management (Placeholder for now, but good to define)
+celery
+redis
+
+chromadb
+python-multipart
+unstructured[all-docs]
+unstructured[local-inference]
+
+# Langchain Core Components
+langchain-community # For integrations like ChatLiteLLM
+langchain-core
+langchain-openai # Often needed for underlying tokenizers or specific features
+
+# UI and API Client
+streamlit
+requests
+
+markdownify
+sentence_transformers
+
+# LLM Provider SDKs
+openai
+google-generativeai
+groq
+langchain-openai
+langchain-google-genai
+langchain-groq
+
+langchain_experimental
+
+PyMuPDF
+fitz
+faiss-cpu==1.7.4
+docker

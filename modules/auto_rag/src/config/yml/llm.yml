@@ -1,0 +1,64 @@
+available_llms:
+  # --- UPDATED OPENAI MODELS ---
+  openai:
+    # Featured Models (GPT-5 Series)
+    gpt-5: { model_name: "gpt-5", provider: "openai", max_tokens: 8192 }
+    gpt-5-mini: { model_name: "gpt-5-mini", provider: "openai", max_tokens: 8192 }
+    gpt-5-nano: { model_name: "gpt-5-nano", provider: "openai", max_tokens: 8192 }
+
+    # Frontier Models (GPT-4 Series)
+    gpt-4.1: { model_name: "gpt-4.1", provider: "openai", max_tokens: 8192 }
+    gpt-4.1-mini: { model_name: "gpt-4.1-mini", provider: "openai", max_tokens: 8192 }
+    gpt-4.1-nano: { model_name: "gpt-4.1-nano", provider: "openai", max_tokens: 8192 }
+    gpt-4o: { model_name: "gpt-4o", provider: "openai", max_tokens: 8192 }
+    gpt-4o-mini: { model_name: "gpt-4o-mini", provider: "openai", max_tokens: 8192 }
+    
+    # Specialized Research Models
+    o3-deep-research: { model_name: "o3-deep-research", provider: "openai", max_tokens: 8192 }
+    o4-mini-deep-research: { model_name: "o4-mini-deep-research", provider: "openai", max_tokens: 8192 }
+    o3-pro: { model_name: "o3-pro", provider: "openai", max_tokens: 8192 }
+    o3: { model_name: "o3", provider: "openai", max_tokens: 8192 }
+    o4-mini: { model_name: "o4-mini", provider: "openai", max_tokens: 8192 }
+
+    # Open-Weight Models
+    gpt-oss-120b: { model_name: "gpt-oss-120b", provider: "openai", max_tokens: 8192 }
+    gpt-oss-20b: { model_name: "gpt-oss-20b", provider: "openai", max_tokens: 8192 }
+
+    # Legacy & Other Models
+    gpt-4-turbo: { model_name: "gpt-4-turbo", provider: "openai", max_tokens: 8192 }
+    gpt-4: { model_name: "gpt-4", provider: "openai", max_tokens: 8192 }
+    gpt-3.5-turbo: { model_name: "gpt-3.5-turbo", provider: "openai", max_tokens: 4096 }
+    babbage-002: { model_name: "babbage-002", provider: "openai", max_tokens: 4096 }
+    davinci-002: { model_name: "davinci-002", provider: "openai", max_tokens: 4096 }
+  
+  google:
+    # Latest Generation (Text Output)
+    gemini-2.5-pro: { model_name: "gemini-2.5-pro", provider: "google", max_tokens: 8192 }
+    gemini-2.5-flash: { model_name: "gemini-2.5-flash", provider: "google", max_tokens: 8192 }
+    gemini-2.5-flash-lite: { model_name: "gemini-2.5-flash-lite", provider: "google", max_tokens: 8192 }
+    
+    # Previous Generation (Text Output)
+    gemini-2.0-flash: { model_name: "gemini-2.0-flash", provider: "google", max_tokens: 8192 }
+    gemini-2.0-flash-lite: { model_name: "gemini-2.0-flash-lite", provider: "google", max_tokens: 8192 }
+    
+    # Original Models
+    gemini-1.5-pro: { model_name: "gemini-1.5-pro-latest", provider: "google", max_tokens: 8192 }
+    gemini-1.0-pro: { model_name: "gemini/gemini-1.0-pro", provider: "google", max_tokens: 8192 }
+
+  groq:
+    # Production Models
+    llama3.1-8b: { model_name: "llama-3.1-8b-instant", provider: "groq", max_tokens: 131072 }
+    llama3.3-70b: { model_name: "llama-3.3-70b-versatile", provider: "groq", max_tokens: 32768 }
+    gpt-oss-120b: { model_name: "openai/gpt-oss-120b", provider: "groq", max_tokens: 65536 }
+    gpt-oss-20b: { model_name: "openai/gpt-oss-20b", provider: "groq", max_tokens: 65536 }
+    
+    # Production Systems (Agentic)
+    compound: { model_name: "groq/compound", provider: "groq", max_tokens: 8192 }
+    compound-mini: { model_name: "groq/compound-mini", provider: "groq", max_tokens: 8192 }
+    
+    # Preview Models (For evaluation)
+    llama4-maverick-17b: { model_name: "meta-llama/llama-4-maverick-17b-128e-instruct", provider: "groq", max_tokens: 8192 }
+    llama4-scout-17b: { model_name: "meta-llama/llama-4-scout-17b-16e-instruct", provider: "groq", max_tokens: 8192 }
+    kimi-k2: { model_name: "moonshotai/kimi-k2-instruct", provider: "groq", max_tokens: 16384 }
+    kimi-k2-0905: { model_name: "moonshotai/kimi-k2-instruct-0905", provider: "groq", max_tokens: 16384 }
+    qwen3-32b: { model_name: "qwen/qwen3-32b", provider: "groq", max_tokens: 40960 }

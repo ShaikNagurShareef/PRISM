@@ -1,0 +1,14 @@
+pandas
+fastapi[all]
+uvicorn
+python-dotenv
+openpyxl
+xl2md
+sqlalchemy
+langchain-openai
+langgraph>0.1.0
+tavily-python
+matplotlib
+psycopg2-binary
+mysql-connector-python
+markdown-pdf

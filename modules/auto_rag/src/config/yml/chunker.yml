@@ -1,0 +1,7 @@
+available_chunkers:
+  recursive:
+    name: "Recursive Text Splitter"
+    class_path: "src.service.modules.chunkers.recursive_chunker.RecursiveChunker"
+  semantic:
+    name: "Semantic Chunker"
+    class_path: "src.service.modules.chunkers.semantic_chunker.SemanticChunker"

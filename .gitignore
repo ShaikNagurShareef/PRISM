@@ -1,0 +1,69 @@
+# PRISM Project .gitignore
+
+# --- Environment Variables ---
+# Never commit your API keys or secrets!
+.env
+
+# --- PRISM Application Data ---
+# Ignore all user-generated data, plots, models, reports, and databases.
+data/
+checkpoints.db
+
+# --- Python Artifacts ---
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- Virtual Environments ---
+.venv/
+venv/
+env/
+ENV/
+venv.bak
+env.bak
+
+# --- IDE / Editor Files ---
+# Visual Studio Code
+.vscode/
+# PyCharm
+.idea/
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+# macOS
+.DS_Store
+# Windows
+Thumbs.db
+
+# --- Testing ---
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.pytest_cache/
+htmlcov/
+
+# --- Jupyter Notebook ---
+.ipynb_checkpoints

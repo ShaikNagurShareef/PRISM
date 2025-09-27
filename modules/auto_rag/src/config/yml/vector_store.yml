@@ -1,0 +1,3 @@
+available_vector_stores:
+  chroma: { class_path: "src.service.modules.vector_stores.chroma_store.ChromaStore" }
+  faiss: { class_path: "src.service.modules.vector_stores.faiss_store.FAISSStore" }
