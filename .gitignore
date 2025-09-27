@@ -8,6 +8,8 @@
 # Ignore all user-generated data, plots, models, reports, and databases.
 data/
 checkpoints.db
+checkpoints.db-shm
+checkpoints.db-wal
 
 # --- Python Artifacts ---
 # Byte-compiled / optimized / DLL files
