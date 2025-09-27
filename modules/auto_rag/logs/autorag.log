@@ -12239,3 +12239,8 @@ ERROR: failed to build: failed to solve: Canceled: context canceled
 2025-09-27 09:39:14,465 - src.api.routers - INFO - Request received for /rags/capabilities endpoint.
 2025-09-27 10:23:22,175 - src.api.main - INFO - AutoRAG application starting up in 'factory' mode...
 2025-09-27 10:23:22,179 - src.database.dbservice - INFO - Database initialized successfully.
+2025-09-27 10:40:59,592 - src.api.routers - INFO - Request received for /rags/capabilities endpoint.
+2025-09-27 10:41:19,710 - src.api.routers - INFO - Request received for /rags/capabilities endpoint.
+2025-09-27 10:41:37,984 - src.api.routers - INFO - Request received for /rags/capabilities endpoint.
+2025-09-27 10:42:11,052 - src.api.routers - INFO - Request received for /rags/capabilities endpoint.
+2025-09-27 10:42:44,855 - src.api.routers - INFO - Request received for /rags/capabilities endpoint.

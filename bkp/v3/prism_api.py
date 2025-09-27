@@ -13,7 +13,6 @@ import tempfile
 from contextlib import redirect_stdout
 from pathlib import Path
 from typing import List, Dict, Union, TypedDict, Any, Optional
-import sqlite3
 
 # --- Third-party Imports ---
 from fastapi import FastAPI, HTTPException, Body, UploadFile, File, Form
@@ -301,7 +300,7 @@ class ModelingCorrectorAgent(BaseAgent):
 class DependencyAnalyzerAgent(BaseAgent):
     def analyze(self, code: str) -> str:
         return self.invoke(code, llm_type="fast")
-    
+
 ### NEW: Report Generator Agent ###
 class ReportGeneratorAgent(BaseAgent):
     def generate(self, source_name: str, chat_history: str) -> str:
@@ -498,15 +497,6 @@ def build_predictive_modeling_graph():
 # ==============================================================================
 app = FastAPI(title="PRISM Backend", description="Insights and Modeling Agent Backend")
 
-# Enable CORS for local dev frontend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 class ProcessSourceRequest(BaseModel): source_config: Dict[str, Any]
 class InsightsRequest(BaseModel): session_id: str; question: str; history: str; source_config: Dict[str, Any]; data_context: str; summary: str
 class StartModelingRequest(BaseModel): session_id: str; task_description: str; source_config: Dict[str, Any]; data_context: str
@@ -524,6 +514,7 @@ insights_agent = InsightsAgent("insights_agent", openai_client)
 modeling_planner_agent = ModelingPlannerAgent("modeling_planner_agent", openai_client, tavily_client)
 modeling_code_gen_agent = ModelingCodeGenAgent("modeling_code_gen_agent", openai_client)
 modeling_corrector_agent = ModelingCorrectorAgent("modeling_corrector_agent", openai_client)
+# dependency_analyzer_agent = DependencyAnalyzerAgent("dependency_analyzer_agent", openai_client)
 report_generator_agent = ReportGeneratorAgent("report_generator_agent", openai_client) ### NEW ###
 excel_loader_service = ExcelLoaderService()
 md_converter_service = MarkdownConverterService()
@@ -534,21 +525,6 @@ predictive_modeling_graph = build_predictive_modeling_graph()
 
 @app.on_event("startup")
 async def startup_event(): setup_directories()
-
-@app.post("/upload_file", tags=["Data Processing"])
-async def upload_file_endpoint(session_id: str = Form(...), file: UploadFile = File(...)):
-    """Accept a file from the browser and save it under data/incoming/{session_id}_{filename}."""
-    try:
-        incoming_dir = settings.DATA_DIR / "incoming"
-        incoming_dir.mkdir(parents=True, exist_ok=True)
-        safe_name = file.filename or "uploaded_file"
-        save_path = incoming_dir / f"{session_id}_{safe_name}"
-        with open(save_path, "wb") as f:
-            f.write(await file.read())
-        return {"path": str(save_path)}
-    except Exception as e:
-        logger.error(f"Upload failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Failed to upload file")
 
 @app.post("/process_source", tags=["Data Processing"])
 async def process_source(request: ProcessSourceRequest = Body(...)):
@@ -647,7 +623,7 @@ async def execute_modeling_pipeline(request: ExecuteModelingRequest):
     except Exception as e:
         logger.error(f"Error executing modeling pipeline: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
-    
+
 @app.post("/export_insights_report", tags=["Data Insights"])
 async def export_insights_report(request: ExportReportRequest):
     try:
@@ -659,38 +635,45 @@ async def export_insights_report(request: ExportReportRequest):
         logger.error(f"Error generating report: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
-# ==============================================================================
-# 7. SESSION RESUME API (read-only)
-# ==============================================================================
-@app.get("/session/{session_id}", tags=["Session"])
-async def get_session(session_id: str):
-    """
-    Load a previously saved PRISM session from data/prism_sessions.db as written by prism.py.
-    Returns { session_id, sources, active_source_name, modeling } or 404 if not found.
-    """
-    try:
-        db_path = Path("./data/prism_sessions.db")
-        if not db_path.exists():
-            raise HTTPException(status_code=404, detail="Session store not found")
-        with sqlite3.connect(str(db_path)) as conn:
-            cur = conn.execute("SELECT state_json FROM sessions WHERE session_id = ?", (session_id,))
-            row = cur.fetchone()
-            if not row:
-                raise HTTPException(status_code=404, detail="PRISM Session ID not found")
-            try:
-                state = json.loads(row[0])
-            except json.JSONDecodeError:
-                raise HTTPException(status_code=500, detail="Corrupted session state")
-        # Ensure only expected fields are returned
-        response = {
-            "session_id": session_id,
-            "sources": state.get("sources", {}),
-            "active_source_name": state.get("active_source_name"),
-            "modeling": state.get("modeling", {}),
-        }
-        return response
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to load session {session_id}: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Failed to load session")
+# @app.post("/export_insights_report_pdf", tags=["Data Insights"])
+# async def export_insights_report_pdf(request: ExportReportRequest):
+#     # First, check if the required command-line tool is installed
+#     if not shutil.which("markdown-pdf"):
+#         raise HTTPException(
+#             status_code=501, 
+#             detail="The 'markdown-pdf' command-line tool is not installed on the server. Please run 'npm install -g markdown-pdf'."
+#         )
+        
+#     try:
+#         history_str = json.dumps(request.chat_history)
+#         report_md = report_generator_agent.generate(request.source_name, history_str)
+
+#         with tempfile.TemporaryDirectory() as temp_dir:
+#             temp_path = Path(temp_dir)
+#             md_path = temp_path / "report.md"
+#             pdf_path = temp_path / "report.pdf"
+            
+#             # Write the generated markdown to a temporary file
+#             md_path.write_text(report_md, encoding='utf-8')
+            
+#             # Run the markdown-pdf command
+#             command = ["markdown-pdf", str(md_path)]
+#             process = subprocess.run(command, capture_output=True, text=True, timeout=60)
+            
+#             if process.returncode != 0:
+#                 logger.error(f"markdown-pdf failed: {process.stderr}")
+#                 raise HTTPException(status_code=500, detail=f"Failed to generate PDF: {process.stderr}")
+
+#             if not pdf_path.exists():
+#                 raise HTTPException(status_code=500, detail="PDF generation failed: Output file not found.")
+
+#             # Read the generated PDF bytes
+#             pdf_bytes = pdf_path.read_bytes()
+            
+#             return StreamingResponse(io.BytesIO(pdf_bytes), media_type="application/pdf", headers={
+#                 "Content-Disposition": f"attachment; filename=PRISM_Report_{request.source_name.replace(' ', '_')}.pdf"
+#             })
+
+#     except Exception as e:
+#         logger.error(f"Error generating PDF report: {e}", exc_info=True)
+#         raise HTTPException(status_code=500, detail=str(e))

@@ -301,6 +301,12 @@ class ModelingCorrectorAgent(BaseAgent):
 class DependencyAnalyzerAgent(BaseAgent):
     def analyze(self, code: str) -> str:
         return self.invoke(code, llm_type="fast")
+    
+### NEW: Report Generator Agent ###
+class ReportGeneratorAgent(BaseAgent):
+    def generate(self, source_name: str, chat_history: str) -> str:
+        prompt = f"Source Name: {source_name}\n\nChat History:\n{chat_history}"
+        return self.invoke(prompt, llm_type="reasoning")
 
 # ==============================================================================
 # 5. LANGGRAPH WORKFLOWS
@@ -505,6 +511,8 @@ class ProcessSourceRequest(BaseModel): source_config: Dict[str, Any]
 class InsightsRequest(BaseModel): session_id: str; question: str; history: str; source_config: Dict[str, Any]; data_context: str; summary: str
 class StartModelingRequest(BaseModel): session_id: str; task_description: str; source_config: Dict[str, Any]; data_context: str
 class ExecuteModelingRequest(BaseModel): session_id: str
+### NEW: Pydantic model for the report request ###
+class ExportReportRequest(BaseModel): source_name: str; chat_history: List[Dict[str, Any]]
 
 openai_client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
 tavily_client = TavilyClient(api_key=settings.TAVILY_API_KEY)
@@ -516,6 +524,7 @@ insights_agent = InsightsAgent("insights_agent", openai_client)
 modeling_planner_agent = ModelingPlannerAgent("modeling_planner_agent", openai_client, tavily_client)
 modeling_code_gen_agent = ModelingCodeGenAgent("modeling_code_gen_agent", openai_client)
 modeling_corrector_agent = ModelingCorrectorAgent("modeling_corrector_agent", openai_client)
+report_generator_agent = ReportGeneratorAgent("report_generator_agent", openai_client) ### NEW ###
 excel_loader_service = ExcelLoaderService()
 md_converter_service = MarkdownConverterService()
 code_executor_service = CodeExecutorService()
@@ -637,6 +646,17 @@ async def execute_modeling_pipeline(request: ExecuteModelingRequest):
         return {"execution_log": final_state.get("execution_log", ""), "artifacts": final_state.get("artifacts", {}), "step_log": final_state.get("step_log", [])}
     except Exception as e:
         logger.error(f"Error executing modeling pipeline: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/export_insights_report", tags=["Data Insights"])
+async def export_insights_report(request: ExportReportRequest):
+    try:
+        # The chat history now contains relative paths, which is what the agent needs
+        history_str = json.dumps(request.chat_history)
+        report_md = report_generator_agent.generate(request.source_name, history_str)
+        return {"report_markdown": report_md}
+    except Exception as e:
+        logger.error(f"Error generating report: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 # ==============================================================================
