@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Box, Button, Code, Flex, Heading, Spinner, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Textarea, useToast, Select, Image } from "@chakra-ui/react";
 import { useAppStore, setModeling } from "../state/appStore";
-import { prismApi, getArtifactUrl, downloadFile, getPlotUrl, prismBaseURL } from "../api/client";
+import { prismApi, getArtifactUrl, downloadFile, getPlotUrl } from "../api/client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -26,10 +26,8 @@ export default function ModelingPage() {
         source_config: source_info.config,
         data_context: source_info.data_context,
       };
-      console.log('🚀 Starting modeling pipeline with payload:', payload);
       const res = await prismApi.post("/start_modeling_pipeline", payload);
       const result = res.data;
-      console.log('✅ Modeling pipeline response:', result);
       
       // Save to global state for persistence
       setModeling({
@@ -41,9 +39,7 @@ export default function ModelingPage() {
         step_log: result.step_log || [],
         download_path: result.download_path || null,
       });
-      toast({ status: "success", title: "ML Pipeline generated successfully!" });
     } catch (e: any) {
-      console.error('❌ Modeling pipeline error:', e);
       toast({ status: "error", title: e?.response?.data?.detail ?? String(e) });
     } finally {
       setLoading(false);
@@ -53,18 +49,13 @@ export default function ModelingPage() {
   async function execute() {
     setExecLoading(true);
     try {
-      console.log('🚀 Executing modeling pipeline for session:', session_id);
       const res = await prismApi.post("/execute_modeling_pipeline", { session_id });
-      const result = res.data;
-      console.log('✅ Execution results:', result);
       
       // Save execution results to global state
       setModeling({
-        execution_results: result,
+        execution_results: res.data,
       });
-      toast({ status: "success", title: "Pipeline executed successfully!" });
     } catch (e: any) {
-      console.error('❌ Execution error:', e);
       toast({ status: "error", title: e?.response?.data?.detail ?? String(e) });
     } finally {
       setExecLoading(false);
@@ -279,10 +270,7 @@ export default function ModelingPage() {
             {modeling.download_path && (
               <Button 
                 onClick={() => {
-                  // Convert backend file path to frontend accessible URL
-                  const cleanPath = modeling.download_path.replace('data/', '');
-                  const url = `${prismBaseURL}/static/${cleanPath}`;
-                  console.log('📦 Downloading file:', { originalPath: modeling.download_path, cleanPath, url });
+                  const url = getArtifactUrl(modeling.download_path || '');
                   downloadFile(url, `${session_id}_pipeline.zip`);
                 }}
                 colorScheme="blue"
@@ -403,7 +391,6 @@ export default function ModelingPage() {
                     _hover={{ transform: "translateY(-1px)" }}
                     onClick={() => {
                       const url = getArtifactUrl(path as string);
-                      console.log('📥 Downloading artifact:', { name, path, url });
                       downloadFile(url, name);
                     }}
                   >

@@ -19,8 +19,6 @@ import sqlite3
 
 # --- Third-party Imports ---
 from fastapi import FastAPI, HTTPException, Body, UploadFile, File, Form
-from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
@@ -501,18 +499,6 @@ def build_predictive_modeling_graph():
 # ==============================================================================
 app = FastAPI(title="PRISM Backend", description="Insights and Modeling Agent Backend")
 
-# Add CORS middleware to allow frontend access
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Mount static files directory to serve plots and artifacts
-app.mount("/static", StaticFiles(directory="data"), name="static")
-
 class ProcessSourceRequest(BaseModel): source_config: Dict[str, Any]
 class InsightsRequest(BaseModel): session_id: str; question: str; history: str; source_config: Dict[str, Any]; data_context: str; summary: str
 class StartModelingRequest(BaseModel): session_id: str; task_description: str; source_config: Dict[str, Any]; data_context: str
@@ -541,10 +527,6 @@ predictive_modeling_graph = build_predictive_modeling_graph()
 
 @app.on_event("startup")
 async def startup_event(): setup_directories()
-
-@app.get("/", tags=["Health"])
-async def root():
-    return {"message": "PRISM Backend API is running", "version": "1.0.0"}
 
 @app.post("/upload_file", tags=["Data Processing"])
 async def upload_file_endpoint(session_id: str = Form(...), file: UploadFile = File(...)):

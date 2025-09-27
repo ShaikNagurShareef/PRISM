@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { autoragApi } from "../api/client";
-import ChatMessage from "../components/ChatMessage";
-import ChatInput from "../components/ChatInput";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Box,
   Button,
@@ -192,321 +192,109 @@ function ManagementView({ onOpenChat, onOpenEdit }: { onOpenChat: (id: string) =
           Configure your RAG system with custom models and settings
         </Text>
         
-        {/* Configuration Grid */}
-        <Box 
-          bg="linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)"
-          borderRadius="xl"
-          p={6}
-          border="1px solid"
-          borderColor="whiteAlpha.200"
-          backdropFilter="blur(20px)"
-          boxShadow="0 4px 16px rgba(0,0,0,0.1)"
-        >
-          <Text color="white" fontSize="md" fontWeight="semibold" mb={4} display="flex" alignItems="center" gap={2}>
-            <Text>⚙️</Text>
-            <Text>Configuration Settings</Text>
-          </Text>
-          
-          <Flex gap={6} mt={4} wrap="wrap" justify="space-between">
-            {/* LLM Provider */}
-            <Box minW="280px" flex="1" maxW="400px">
-              <Text color="white" fontSize="sm" fontWeight="semibold" mb={3} display="flex" alignItems="center" gap={2}>
-                <Text>🤖</Text>
-                <Text>LLM Provider</Text>
-              </Text>
-              <Select 
-                value={llmProvider} 
-                onChange={(e) => { const v=e.target.value; setLlmProvider(v); setLlmModel(""); }} 
-                variant="modern"
-                placeholder={llmProviders.length ? undefined : "No providers"}
-                bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-                border="1px solid"
-                borderColor="whiteAlpha.200"
-                _focus={{
-                  borderColor: "brand.400",
-                  boxShadow: "0 0 0 1px rgba(132,64,255,0.3)",
-                  bg: "rgba(255,255,255,0.15)"
-                }}
-                _hover={{
-                  borderColor: "whiteAlpha.300",
-                  bg: "rgba(255,255,255,0.1)"
-                }}
-                transition="all 0.3s ease"
-              >
-                {llmProviders.map((p) => <option key={p} value={p}>{p}</option>)}
-              </Select>
-            </Box>
-
-            {/* LLM Model */}
-            <Box minW="280px" flex="1" maxW="400px">
-              <Text color="white" fontSize="sm" fontWeight="semibold" mb={3} display="flex" alignItems="center" gap={2}>
-                <Text>🧠</Text>
-                <Text>LLM Model</Text>
-              </Text>
-              <Select 
-                value={llmModel} 
-                onChange={(e) => setLlmModel(e.target.value)} 
-                placeholder={llmProvider ? "Select a model" : "Select provider first"} 
-                variant="modern"
-                bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-                border="1px solid"
-                borderColor="whiteAlpha.200"
-                _focus={{
-                  borderColor: "brand.400",
-                  boxShadow: "0 0 0 1px rgba(132,64,255,0.3)",
-                  bg: "rgba(255,255,255,0.15)"
-                }}
-                _hover={{
-                  borderColor: "whiteAlpha.300",
-                  bg: "rgba(255,255,255,0.1)"
-                }}
-                transition="all 0.3s ease"
-              >
-                {Object.keys(capabilities.available_llms?.[llmProvider]||{}).map((m) => <option key={m} value={m}>{m}</option>)}
-              </Select>
-            </Box>
-
-            {/* Embedding Provider */}
-            <Box minW="280px" flex="1" maxW="400px">
-              <Text color="white" fontSize="sm" fontWeight="semibold" mb={3} display="flex" alignItems="center" gap={2}>
-                <Text>🔗</Text>
-                <Text>Embedding Provider</Text>
-              </Text>
-              <Select 
-                value={embedProvider} 
-                onChange={(e) => { const v=e.target.value; setEmbedProvider(v); setEmbedModel(""); }} 
-                variant="modern"
-                placeholder={embedProviders.length ? undefined : "No providers"}
-                bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-                border="1px solid"
-                borderColor="whiteAlpha.200"
-                _focus={{
-                  borderColor: "prismTeal.400",
-                  boxShadow: "0 0 0 1px rgba(20,184,166,0.3)",
-                  bg: "rgba(255,255,255,0.15)"
-                }}
-                _hover={{
-                  borderColor: "whiteAlpha.300",
-                  bg: "rgba(255,255,255,0.1)"
-                }}
-                transition="all 0.3s ease"
-              >
-                {embedProviders.map((p) => <option key={p} value={p}>{p}</option>)}
-              </Select>
-            </Box>
-
-            {/* Embedding Model */}
-            <Box minW="280px" flex="1" maxW="400px">
-              <Text color="white" fontSize="sm" fontWeight="semibold" mb={3} display="flex" alignItems="center" gap={2}>
-                <Text>🎯</Text>
-                <Text>Embedding Model</Text>
-              </Text>
-              <Select 
-                value={embedModel} 
-                onChange={(e) => setEmbedModel(e.target.value)} 
-                placeholder={embedProvider ? "Select a model" : "Select provider first"} 
-                variant="modern"
-                bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-                border="1px solid"
-                borderColor="whiteAlpha.200"
-                _focus={{
-                  borderColor: "prismTeal.400",
-                  boxShadow: "0 0 0 1px rgba(20,184,166,0.3)",
-                  bg: "rgba(255,255,255,0.15)"
-                }}
-                _hover={{
-                  borderColor: "whiteAlpha.300",
-                  bg: "rgba(255,255,255,0.1)"
-                }}
-                transition="all 0.3s ease"
-              >
-                {Object.keys(capabilities.available_embedders?.[embedProvider]||{}).map((m) => <option key={m} value={m}>{m}</option>)}
-              </Select>
-            </Box>
-
-            {/* Vector Store */}
-            <Box minW="280px" flex="1" maxW="400px">
-              <Text color="white" fontSize="sm" fontWeight="semibold" mb={3} display="flex" alignItems="center" gap={2}>
-                <Text>🗄️</Text>
-                <Text>Vector Store</Text>
-              </Text>
-              <Select 
-                value={vectorStore} 
-                onChange={(e) => setVectorStore(e.target.value)} 
-                variant="modern"
-                bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-                border="1px solid"
-                borderColor="whiteAlpha.200"
-                _focus={{
-                  borderColor: "brand.400",
-                  boxShadow: "0 0 0 1px rgba(132,64,255,0.3)",
-                  bg: "rgba(255,255,255,0.15)"
-                }}
-                _hover={{
-                  borderColor: "whiteAlpha.300",
-                  bg: "rgba(255,255,255,0.1)"
-                }}
-                transition="all 0.3s ease"
-              >
-                {Object.keys(capabilities.available_vector_stores||{}).map((v) => <option key={v} value={v}>{v}</option>)}
-              </Select>
-            </Box>
-
-            {/* Chunking Strategy */}
-            <Box minW="280px" flex="1" maxW="400px">
-              <Text color="white" fontSize="sm" fontWeight="semibold" mb={3} display="flex" alignItems="center" gap={2}>
-                <Text>✂️</Text>
-                <Text>Chunking Strategy</Text>
-              </Text>
-              <Select 
-                value={chunker} 
-                onChange={(e) => setChunker(e.target.value)} 
-                variant="modern"
-                bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-                border="1px solid"
-                borderColor="whiteAlpha.200"
-                _focus={{
-                  borderColor: "prismTeal.400",
-                  boxShadow: "0 0 0 1px rgba(20,184,166,0.3)",
-                  bg: "rgba(255,255,255,0.15)"
-                }}
-                _hover={{
-                  borderColor: "whiteAlpha.300",
-                  bg: "rgba(255,255,255,0.1)"
-                }}
-                transition="all 0.3s ease"
-              >
-                {Object.keys(capabilities.available_chunkers||{}).map((c) => <option key={c} value={c}>{capabilities.available_chunkers[c]?.name ?? c}</option>)}
-              </Select>
-            </Box>
-          </Flex>
-        </Box>
+        <Flex gap={4} mt={4} wrap="wrap">
+          <Box minW="240px" flex="1">
+            <Text color="white" fontSize="sm" fontWeight="semibold" mb={2}>LLM Provider</Text>
+            <Select 
+              value={llmProvider} 
+              onChange={(e) => { const v=e.target.value; setLlmProvider(v); setLlmModel(""); }} 
+              variant="modern"
+              placeholder={llmProviders.length ? undefined : "No providers"}
+            >
+              {llmProviders.map((p) => <option key={p} value={p}>{p}</option>)}
+            </Select>
+          </Box>
+          <Box minW="240px" flex="1">
+            <Text color="white" fontSize="sm" fontWeight="semibold" mb={2}>LLM Model</Text>
+            <Select 
+              value={llmModel} 
+              onChange={(e) => setLlmModel(e.target.value)} 
+              placeholder={llmProvider ? "Select a model" : "Select provider first"} 
+              variant="modern"
+            >
+              {Object.keys(capabilities.available_llms?.[llmProvider]||{}).map((m) => <option key={m} value={m}>{m}</option>)}
+            </Select>
+          </Box>
+          <Box minW="240px" flex="1">
+            <Text color="white" fontSize="sm" fontWeight="semibold" mb={2}>Embedding Provider</Text>
+            <Select 
+              value={embedProvider} 
+              onChange={(e) => { const v=e.target.value; setEmbedProvider(v); setEmbedModel(""); }} 
+              variant="modern"
+              placeholder={embedProviders.length ? undefined : "No providers"}
+            >
+              {embedProviders.map((p) => <option key={p} value={p}>{p}</option>)}
+            </Select>
+          </Box>
+          <Box minW="240px" flex="1">
+            <Text color="white" fontSize="sm" fontWeight="semibold" mb={2}>Embedding Model</Text>
+            <Select 
+              value={embedModel} 
+              onChange={(e) => setEmbedModel(e.target.value)} 
+              placeholder={embedProvider ? "Select a model" : "Select provider first"} 
+              variant="modern"
+            >
+              {Object.keys(capabilities.available_embedders?.[embedProvider]||{}).map((m) => <option key={m} value={m}>{m}</option>)}
+            </Select>
+          </Box>
+          <Box minW="240px" flex="1">
+            <Text color="white" fontSize="sm" fontWeight="semibold" mb={2}>Vector Store</Text>
+            <Select 
+              value={vectorStore} 
+              onChange={(e) => setVectorStore(e.target.value)} 
+              variant="modern"
+            >
+              {Object.keys(capabilities.available_vector_stores||{}).map((v) => <option key={v} value={v}>{v}</option>)}
+            </Select>
+          </Box>
+          <Box minW="240px" flex="1">
+            <Text color="white" fontSize="sm" fontWeight="semibold" mb={2}>Chunking Strategy</Text>
+            <Select 
+              value={chunker} 
+              onChange={(e) => setChunker(e.target.value)} 
+              variant="modern"
+            >
+              {Object.keys(capabilities.available_chunkers||{}).map((c) => <option key={c} value={c}>{capabilities.available_chunkers[c]?.name ?? c}</option>)}
+            </Select>
+          </Box>
+        </Flex>
         
-        {/* RAG Details Section */}
-        <Box 
-          bg="linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)"
-          borderRadius="xl"
-          p={6}
-          border="1px solid"
-          borderColor="whiteAlpha.200"
-          backdropFilter="blur(20px)"
-          boxShadow="0 4px 16px rgba(0,0,0,0.1)"
-          mt={6}
-        >
-          <Text color="white" fontSize="md" fontWeight="semibold" mb={4} display="flex" alignItems="center" gap={2}>
-            <Text>📝</Text>
-            <Text>RAG Details</Text>
-          </Text>
-          
-          <VStack spacing={6} align="stretch">
-            {/* RAG Name */}
-            <Box>
-              <Text color="white" fontSize="sm" fontWeight="semibold" mb={3} display="flex" alignItems="center" gap={2}>
-                <Text>🏷️</Text>
-                <Text>RAG Name</Text>
-              </Text>
-              <Input 
-                value={name} 
-                onChange={(e) => setName(e.target.value)} 
-                placeholder="e.g., Financial Analyst Bot" 
-                variant="modern"
-                size="lg"
-                bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-                border="1px solid"
-                borderColor="whiteAlpha.200"
-                _focus={{
-                  borderColor: "brand.400",
-                  boxShadow: "0 0 0 1px rgba(132,64,255,0.3)",
-                  bg: "rgba(255,255,255,0.15)"
-                }}
-                _hover={{
-                  borderColor: "whiteAlpha.300",
-                  bg: "rgba(255,255,255,0.1)"
-                }}
-                transition="all 0.3s ease"
-              />
-            </Box>
-
-            {/* Description */}
-            <Box>
-              <Text color="white" fontSize="sm" fontWeight="semibold" mb={3} display="flex" alignItems="center" gap={2}>
-                <Text>📄</Text>
-                <Text>Description</Text>
-              </Text>
-              <Textarea 
-                value={description} 
-                onChange={(e) => setDescription(e.target.value)} 
-                placeholder="Provide a brief description of what this RAG instance does..." 
-                variant="modern"
-                rows={3}
-                bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-                border="1px solid"
-                borderColor="whiteAlpha.200"
-                _focus={{
-                  borderColor: "prismTeal.400",
-                  boxShadow: "0 0 0 1px rgba(20,184,166,0.3)",
-                  bg: "rgba(255,255,255,0.15)"
-                }}
-                _hover={{
-                  borderColor: "whiteAlpha.300",
-                  bg: "rgba(255,255,255,0.1)"
-                }}
-                transition="all 0.3s ease"
-                resize="vertical"
-              />
-            </Box>
-
-            {/* System Prompt */}
-            <Box>
-              <Text color="white" fontSize="sm" fontWeight="semibold" mb={3} display="flex" alignItems="center" gap={2}>
-                <Text>🤖</Text>
-                <Text>Custom System Prompt</Text>
-              </Text>
-              <Textarea 
-                value={systemPrompt} 
-                onChange={(e) => setSystemPrompt(e.target.value)} 
-                rows={6} 
-                variant="modern"
-                bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-                border="1px solid"
-                borderColor="whiteAlpha.200"
-                _focus={{
-                  borderColor: "brand.400",
-                  boxShadow: "0 0 0 1px rgba(132,64,255,0.3)",
-                  bg: "rgba(255,255,255,0.15)"
-                }}
-                _hover={{
-                  borderColor: "whiteAlpha.300",
-                  bg: "rgba(255,255,255,0.1)"
-                }}
-                transition="all 0.3s ease"
-                resize="vertical"
-                placeholder="Define how the AI assistant should behave and respond..."
-              />
-            </Box>
-          </VStack>
+        <Box mt={6}>
+          <Text color="white" fontSize="sm" fontWeight="semibold" mb={2}>RAG Name</Text>
+          <Input 
+            value={name} 
+            onChange={(e) => setName(e.target.value)} 
+            placeholder="e.g., Financial Analyst Bot" 
+            variant="modern"
+            size="lg"
+          />
         </Box>
-
-        {/* Create Button */}
+        <Box mt={4}>
+          <Text color="white" fontSize="sm" fontWeight="semibold" mb={2}>Description</Text>
+          <Textarea 
+            value={description} 
+            onChange={(e) => setDescription(e.target.value)} 
+            placeholder="Short summary" 
+            variant="modern"
+            rows={3}
+          />
+        </Box>
+        <Box mt={4}>
+          <Text color="white" fontSize="sm" fontWeight="semibold" mb={2}>Custom System Prompt</Text>
+          <Textarea 
+            value={systemPrompt} 
+            onChange={(e) => setSystemPrompt(e.target.value)} 
+            rows={6} 
+            variant="modern"
+          />
+        </Box>
         <Button 
           mt={6} 
           onClick={handleCreate}
           size="lg"
           variant="solid"
           borderRadius="lg"
-          bg="linear-gradient(135deg, brand.500 0%, brand.400 100%)"
-          color="white"
-          fontWeight="semibold"
-          _hover={{ 
-            transform: "translateY(-2px)",
-            boxShadow: "0 8px 24px rgba(132,64,255,0.4)",
-            bg: "linear-gradient(135deg, brand.600 0%, brand.500 100%)"
-          }}
-          _active={{
-            transform: "translateY(0px)"
-          }}
-          transition="all 0.3s ease"
-          leftIcon={<Text fontSize="lg">🚀</Text>}
+          _hover={{ transform: "translateY(-1px)" }}
         >
           Create RAG Instance
         </Button>
@@ -872,24 +660,52 @@ function ChatView({ ragId, onBack }: { ragId: string; onBack: () => void }) {
 
         <Box flex="1">
           {(history ?? []).map((m: any, idx: number) => (
-            <ChatMessage
-              key={idx}
-              role={m.role}
-              content={m.content}
-              sources={m.sources}
-              timestamp={new Date().toLocaleTimeString()}
-            />
+            <Box key={idx} p={3} borderWidth="1px" borderRadius="md" mb={2} bg={m.role === "assistant" ? "whiteAlpha.50" : "transparent"}>
+              <Text fontWeight="bold" mb={1}>{m.role === "assistant" ? "Assistant" : "You"}</Text>
+              <Box>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {m.content}
+                </ReactMarkdown>
+              </Box>
+              {m.sources && m.sources.length > 0 && (
+                <Box mt={3}>
+                  <Accordion allowToggle>
+                    <AccordionItem border="none">
+                      <AccordionButton px={0} py={2} _hover={{ bg: "transparent" }}>
+                        <Box flex="1" textAlign="left">
+                          <Text fontSize="sm" fontWeight="medium" color="prismTeal.300">
+                            📚 Sources ({m.sources.length} documents)
+                          </Text>
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                      <AccordionPanel px={0} pb={0}>
+                        <Box bg="whiteAlpha.50" p={3} borderRadius="md" borderWidth="1px" borderColor="whiteAlpha.200">
+                          <VStack align="stretch" spacing={3}>
+                            {m.sources.map((s: any, i: number) => (
+                              <Box key={i} p={3} bg="blackAlpha.100" borderRadius="md" borderLeft="3px solid" borderLeftColor="prismTeal.400">
+                                <Text fontSize="sm" fontWeight="medium" color="prismTeal.200" mb={1}>
+                                  📄 Source {i+1}: {s.document_name ?? 'Unknown Document'}
+                                </Text>
+                                <Text fontSize="xs" color="gray.300" fontFamily="mono" whiteSpace="pre-wrap">
+                                  {s.content_snippet ?? 'No content snippet available'}
+                                </Text>
+                              </Box>
+                            ))}
+                          </VStack>
+                        </Box>
+                      </AccordionPanel>
+                    </AccordionItem>
+                  </Accordion>
+                </Box>
+              )}
+            </Box>
           ))}
 
-          <Box mt={4}>
-            <ChatInput
-              value={input}
-              onChange={setInput}
-              onSend={send}
-              loading={sending}
-              placeholder="Ask a question about your documents..."
-            />
-          </Box>
+          <Flex gap={2} mt={3}>
+            <Textarea placeholder="Ask a question about your documents..." value={input} onChange={(e) => setInput(e.target.value)} />
+            <Button onClick={send} disabled={!input || sending} minW="120px">{sending ? <Spinner size="sm" /> : "Send"}</Button>
+          </Flex>
         </Box>
       </Flex>
     </Flex>

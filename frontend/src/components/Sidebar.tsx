@@ -231,53 +231,49 @@ export default function Sidebar() {
           />
         </Box>
 
-        {/* Configure New Data Sources */}
-        <Box>
-          <Heading size="md" color="white" mb={4} fontWeight="bold">
-            Configure New Data Sources
-          </Heading>
-          <Box
-            bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-            borderRadius="xl"
-            p={6}
-            border="1px solid"
-            borderColor="whiteAlpha.200"
-            backdropFilter="blur(20px)"
-            boxShadow="0 4px 16px rgba(0,0,0,0.1)"
-            position="relative"
-            zIndex={2}
-            _hover={{
-              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-              borderColor: "whiteAlpha.300",
-              transform: "translateY(-2px)",
-            }}
-            transition="all 0.3s ease"
-          >
-            <Accordion allowToggle defaultIndex={0}>
-              <AccordionItem border="none">
-                <AccordionButton
-                  _hover={{ bg: "transparent" }}
-                  px={5}
-                  py={4}
-                  borderRadius="lg"
-                  bg="linear-gradient(135deg, brand.500 0%, brand.400 100%)"
-                  color="white"
-                  fontWeight="bold"
-                  boxShadow="0 4px 16px rgba(132,64,255,0.3)"
-                  border="1px solid"
-                  borderColor="brand.400"
-                  _expanded={{ 
-                    bg: "linear-gradient(135deg, brand.600 0%, brand.500 100%)",
-                    boxShadow: "0 6px 20px rgba(132,64,255,0.4)",
-                    transform: "translateY(-1px)",
-                  }}
-                  transition="all 0.3s ease"
-                >
-                  <Box flex="1" textAlign="left" display="flex" alignItems="center" gap={2}>
-                    <Text fontSize="md" fontWeight="semibold">➕ Add New Data Source</Text>
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
+        {/* Add New Data Source */}
+        <Box
+          bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
+          borderRadius="xl"
+          p={6}
+          border="1px solid"
+          borderColor="whiteAlpha.200"
+          backdropFilter="blur(20px)"
+          boxShadow="0 4px 16px rgba(0,0,0,0.1)"
+          position="relative"
+          zIndex={2}
+          _hover={{
+            boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+            borderColor: "whiteAlpha.300",
+            transform: "translateY(-2px)",
+          }}
+          transition="all 0.3s ease"
+        >
+          <Accordion allowToggle defaultIndex={0}>
+            <AccordionItem border="none">
+              <AccordionButton
+                _hover={{ bg: "transparent" }}
+                px={5}
+                py={4}
+                borderRadius="lg"
+                bg="linear-gradient(135deg, brand.500 0%, brand.400 100%)"
+                color="white"
+                fontWeight="bold"
+                boxShadow="0 4px 16px rgba(132,64,255,0.3)"
+                border="1px solid"
+                borderColor="brand.400"
+                _expanded={{ 
+                  bg: "linear-gradient(135deg, brand.600 0%, brand.500 100%)",
+                  boxShadow: "0 6px 20px rgba(132,64,255,0.4)",
+                  transform: "translateY(-1px)",
+                }}
+                transition="all 0.3s ease"
+              >
+                <Box flex="1" textAlign="left" display="flex" alignItems="center" gap={2}>
+                  <Text fontSize="md" fontWeight="semibold">➕ Add New Data Source</Text>
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
               <AccordionPanel px={0} pb={0}>
                 <Tabs variant="enclosed" colorScheme="teal" mt={4}>
                   <TabList 
@@ -322,112 +318,43 @@ export default function Sidebar() {
                   <TabPanels>
                     {/* File Upload Tab */}
                     <TabPanel px={0} py={4} bg="linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)" borderRadius="lg" mt={3}>
-                      <VStack spacing={6} align="stretch">
-                        {/* File Source Name */}
-                        <Box>
-                          <FormLabel color="white" fontSize="sm" fontWeight="semibold" mb={3} display="flex" alignItems="center" gap={2}>
-                            <Text>📝</Text>
-                            <Text>File Source Name</Text>
+                      <VStack spacing={4} align="stretch">
+                        <FormControl>
+                          <FormLabel color="white" fontSize="sm" fontWeight="semibold" mb={2}>
+                            File Source Name
                           </FormLabel>
                           <Input
-                            placeholder="Enter a descriptive name for your data source"
+                            placeholder="Enter source name"
                             value={fileSourceName}
                             onChange={(e) => setFileSourceName(e.target.value)}
                             variant="modern"
-                            size="md"
+                            size="sm"
                             _placeholder={{ color: "whiteAlpha.600" }}
-                            bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-                            border="1px solid"
-                            borderColor="whiteAlpha.200"
-                            _focus={{
-                              borderColor: "prismTeal.400",
-                              boxShadow: "0 0 0 1px rgba(20,184,166,0.3)",
-                              bg: "rgba(255,255,255,0.15)"
-                            }}
-                            _hover={{
-                              borderColor: "whiteAlpha.300",
-                              bg: "rgba(255,255,255,0.1)"
-                            }}
-                            transition="all 0.3s ease"
                           />
-                        </Box>
+                        </FormControl>
 
-                        {/* File Upload */}
-                        <Box>
-                          <FormLabel color="white" fontSize="sm" fontWeight="semibold" mb={3} display="flex" alignItems="center" gap={2}>
-                            <Text>📊</Text>
-                            <Text>Upload Excel File</Text>
+                        <FormControl>
+                          <FormLabel color="white" fontSize="sm" fontWeight="semibold" mb={2}>
+                            Upload an Excel file
                           </FormLabel>
-                          <Box
-                            position="relative"
-                            bg="linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
-                            borderRadius="lg"
-                            border="2px dashed"
-                            borderColor="whiteAlpha.300"
-                            p={6}
-                            textAlign="center"
-                            transition="all 0.3s ease"
-                            _hover={{
-                              borderColor: "prismTeal.400",
-                              bg: "rgba(20,184,166,0.1)",
-                              transform: "translateY(-2px)",
-                              boxShadow: "0 8px 24px rgba(20,184,166,0.2)"
-                            }}
-                          >
-                            <VStack spacing={3}>
-                              <Box fontSize="2xl">📁</Box>
-                              <Text color="white" fontSize="sm" fontWeight="medium">
-                                {fileToUpload ? fileToUpload.name : "Choose Excel file to upload"}
-                              </Text>
-                              <Text color="whiteAlpha.600" fontSize="xs">
-                                Supports .xlsx files only
-                              </Text>
-                              <Input
-                                type="file"
-                                accept=".xlsx"
-                                onChange={handleFileChange}
-                                position="absolute"
-                                top={0}
-                                left={0}
-                                width="100%"
-                                height="100%"
-                                opacity={0}
-                                cursor="pointer"
-                                zIndex={1}
-                              />
-                            </VStack>
-                          </Box>
-                        </Box>
+                          <Input
+                            type="file"
+                            accept=".xlsx"
+                            onChange={handleFileChange}
+                            variant="modern"
+                            size="sm"
+                            p={2}
+                          />
+                        </FormControl>
 
-                        {/* Add Button */}
                         <Button
                           colorScheme="teal"
                           onClick={handleAddFileSource}
                           isDisabled={!fileSourceName || !fileToUpload}
-                          size="md"
+                          size="sm"
                           borderRadius="lg"
-                          bg="linear-gradient(135deg, prismTeal.500 0%, prismTeal.400 100%)"
-                          color="white"
-                          fontWeight="semibold"
-                          _hover={{ 
-                            transform: "translateY(-2px)",
-                            boxShadow: "0 8px 24px rgba(20,184,166,0.4)",
-                            bg: "linear-gradient(135deg, prismTeal.600 0%, prismTeal.500 100%)"
-                          }}
-                          _active={{
-                            transform: "translateY(0px)"
-                          }}
-                          _disabled={{
-                            bg: "whiteAlpha.200",
-                            color: "whiteAlpha.500",
-                            cursor: "not-allowed",
-                            _hover: {
-                              transform: "none",
-                              boxShadow: "none"
-                            }
-                          }}
-                          transition="all 0.3s ease"
-                          leftIcon={<Text fontSize="lg">🚀</Text>}
+                          _hover={{ transform: "translateY(-1px)" }}
+                          variant="solid"
                         >
                           Add File Source
                         </Button>
@@ -609,15 +536,14 @@ export default function Sidebar() {
               </AccordionPanel>
             </AccordionItem>
           </Accordion>
-          </Box>
-        </Box>
+      </Box>
 
         <Divider borderColor="whiteAlpha.300" />
 
-        {/* Existing Data Sources */}
+        {/* Configured Data Sources */}
         <Box>
           <Heading size="md" color="white" mb={4} fontWeight="bold">
-            Existing Data Sources
+            Data Sources
           </Heading>
           {Object.keys(sources).length === 0 ? (
             <Box 
