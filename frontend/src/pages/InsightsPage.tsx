@@ -294,7 +294,7 @@ export default function InsightsPage() {
             onChange={(e) => setInput(e.target.value)}
             variant="modern"
             resize="none"
-            rows={3}
+            rows={1.5}
             flex="1"
             _placeholder={{ color: "whiteAlpha.600" }}
           />
