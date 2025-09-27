@@ -48,17 +48,31 @@ export default function AboutPage() {
     },
     {
       icon: FiCpu,
-      title: "Smart Modeling",
-      description: "Automated ML pipeline generation with intelligent model selection",
+      title: "Sandbox Environment",
+      description: "Automated ML pipeline generation and execution within sandbox environments",
       color: "brand.400",
       bgGradient: "linear(135deg, brand.500 0%, brand.300 100%)"
     },
     {
       icon: FiDatabase,
-      title: "AutoRAG System",
+      title: "AutoRAG Management System",
       description: "Advanced Retrieval-Augmented Generation for intelligent data queries",
       color: "accent.400",
       bgGradient: "linear(135deg, accent.500 0%, accent.300 100%)"
+    },
+    {
+      icon: FiDatabase,
+      title: "AutoVector DB",
+      description: "Seamless connection to PostgreSQL, MySQL, SQLite with automatic schema detection",
+      color: "cyan.400",
+      bgGradient: "linear(135deg, cyan.500 0%, cyan.300 100%)"
+    },
+    {
+      icon: FiCpu,
+      title: "Auto-Configurable Models",
+      description: "Intelligent model selection and hyperparameter tuning for optimal performance",
+      color: "pink.400",
+      bgGradient: "linear(135deg, pink.500 0%, pink.300 100%)"
     },
     {
       icon: FiActivity,
@@ -80,12 +94,13 @@ export default function AboutPage() {
       description: "Optimized performance with real-time processing capabilities",
       color: "orange.400",
       bgGradient: "linear(135deg, orange.500 0%, orange.300 100%)"
-    }
+    },
+    
   ];
 
   const stats = [
     { label: "Data Sources", value: "Unlimited", icon: FiDatabase },
-    { label: "AI Models", value: "50+", icon: FiActivity },
+    { label: "AI Models", value: "30+", icon: FiActivity },
     { label: "Developement Speed", value: "10x Faster", icon: FiZap },
     { label: "Execution Accuracy", value: "99.9%", icon: FiTarget }
   ];
@@ -186,7 +201,7 @@ export default function AboutPage() {
             maxW="800px"
             lineHeight="1.6"
           >
-            The Next Generation AI-Powered Data Intelligence Platform
+            The Next Gen AI-Powered Data Intelligence Platform
           </MotionText>
 
           <MotionText

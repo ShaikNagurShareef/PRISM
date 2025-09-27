@@ -149,7 +149,7 @@ export default function SplashScreen({ onEnter }: SplashScreenProps) {
                 maxW="600px"
                 px={4}
               >
-                Next Generation AI-Powered Data Intelligence Platform
+                Next Gen AI-Powered Data Intelligence Platform
               </MotionText>
 
               <MotionText

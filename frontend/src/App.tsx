@@ -55,7 +55,7 @@ export default function App() {
             backdropFilter="saturate(180%) blur(40px)"
             boxShadow="0 8px 32px rgba(0,0,0,0.12)"
           >
-          <HStack spacing={8}>
+          <HStack spacing={3}>
             <MotionBox 
               initial={{ scale: 0.8, opacity: 0, rotate: -180 }} 
               animate={{ scale: 1, opacity: 1, rotate: 0 }} 
@@ -82,7 +82,7 @@ export default function App() {
             >
               <Text 
                 fontWeight="extrabold" 
-                fontSize="xl" 
+                fontSize="3xl" 
                 letterSpacing="wider" 
                 bgGradient="linear(135deg, brand.400 0%, prismTeal.400 50%, accent.400 100%)" 
                 bgClip="text"

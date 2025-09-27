@@ -153,9 +153,31 @@ export default function InsightsPage() {
                 wordBreak="break-word"
                 overflowWrap="break-word"
                 overflow="hidden"
-                whiteSpace="pre-wrap"
               >
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown 
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    p: ({ children }) => <Text mb={2}>{children}</Text>,
+                    strong: ({ children }) => <Text as="strong" fontWeight="bold" color="white">{children}</Text>,
+                    em: ({ children }) => <Text as="em" fontStyle="italic">{children}</Text>,
+                    code: ({ children }) => (
+                      <Text as="code" bg="whiteAlpha.200" px={1} py={0.5} borderRadius="sm" fontSize="sm" fontFamily="mono">
+                        {children}
+                      </Text>
+                    ),
+                    pre: ({ children }) => (
+                      <Box as="pre" bg="whiteAlpha.100" p={3} borderRadius="md" overflow="auto" fontSize="sm" fontFamily="mono">
+                        {children}
+                      </Box>
+                    ),
+                    ul: ({ children }) => <Box as="ul" pl={4} mb={2}>{children}</Box>,
+                    ol: ({ children }) => <Box as="ol" pl={4} mb={2}>{children}</Box>,
+                    li: ({ children }) => <Box as="li" mb={1}>{children}</Box>,
+                    h1: ({ children }) => <Heading size="lg" color="white" mb={3}>{children}</Heading>,
+                    h2: ({ children }) => <Heading size="md" color="white" mb={2}>{children}</Heading>,
+                    h3: ({ children }) => <Heading size="sm" color="white" mb={2}>{children}</Heading>,
+                  }}
+                >
                   {m.content}
                 </ReactMarkdown>
               </Box>
