@@ -359,12 +359,12 @@ export default function Sidebar() {
                             }}
                           >
                             <VStack spacing={4}>
-                              <Box fontSize="4xl" opacity={0.8}>
-                                📁
+                              <Box fontSize="3xl" opacity={0.8}>
+                                📄
                               </Box>
                               <VStack spacing={2}>
                                 <Text color="white" fontSize="md" fontWeight="semibold">
-                                  {fileToUpload ? fileToUpload.name : "Choose Excel file to upload"}
+                                  Drop files here or click to browse
                                 </Text>
                                 <Text color="whiteAlpha.600" fontSize="sm">
                                   Supports .xlsx files only • Max 10MB
@@ -391,7 +391,7 @@ export default function Sidebar() {
                                 }}
                                 transition="all 0.2s ease"
                               >
-                                Browse Files
+                                Choose Files
                               </Box>
                               <Input
                                 type="file"

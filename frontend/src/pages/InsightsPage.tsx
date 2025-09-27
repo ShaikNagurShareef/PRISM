@@ -120,7 +120,8 @@ export default function InsightsPage() {
             justifyContent={m.role === "assistant" ? "flex-start" : "flex-end"}
           >
             <Box
-              maxW="80%"
+              maxW={{ base: "95%", md: "80%" }}
+              minW="200px"
               bg={m.role === "assistant" 
                 ? "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
                 : "linear-gradient(135deg, brand.500 0%, brand.400 100%)"
@@ -136,6 +137,9 @@ export default function InsightsPage() {
                 : "0 4px 16px rgba(132,64,255,0.3)"
               }
               position="relative"
+              wordBreak="break-word"
+              overflowWrap="break-word"
+              overflow="hidden"
             >
               <Text 
                 fontWeight="bold" 
@@ -143,9 +147,14 @@ export default function InsightsPage() {
                 fontSize="sm"
                 color={m.role === "assistant" ? "prismTeal.300" : "white"}
               >
-                {m.role === "assistant" ? "🤖 AI Assistant" : "👤 You"}
+                {m.role === "assistant" ? "🤖 PRISM AI Assistant" : "👤 You"}
               </Text>
-              <Box>
+              <Box
+                wordBreak="break-word"
+                overflowWrap="break-word"
+                overflow="hidden"
+                whiteSpace="pre-wrap"
+              >
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {m.content}
                 </ReactMarkdown>
@@ -221,7 +230,15 @@ export default function InsightsPage() {
                                 borderLeftColor="prismTeal.400"
                                 boxShadow="0 2px 4px rgba(0,0,0,0.1)"
                               >
-                                <Text fontSize="xs" color="whiteAlpha.800" fontFamily="mono" lineHeight="1.4">
+                                <Text 
+                                  fontSize="xs" 
+                                  color="whiteAlpha.800" 
+                                  fontFamily="mono" 
+                                  lineHeight="1.4"
+                                  wordBreak="break-word"
+                                  overflowWrap="break-word"
+                                  whiteSpace="pre-wrap"
+                                >
                                   {step}
                                 </Text>
                               </Box>
